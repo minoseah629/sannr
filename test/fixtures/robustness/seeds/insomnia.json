@@ -1,0 +1,34 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "resources": [
+    {
+      "_type": "workspace",
+      "_id": "wrk_1",
+      "name": "Robustness"
+    },
+    {
+      "_type": "environment",
+      "_id": "env_1",
+      "parentId": "wrk_1",
+      "name": "local",
+      "data": {
+        "apiToken": "ROB1_AUTH_VALUE_7f4d9a",
+        "unusedRegion": "ROB1_ENV_VALUE_7f4d9a"
+      }
+    },
+    {
+      "_type": "request",
+      "_id": "req_1",
+      "parentId": "wrk_1",
+      "name": "health",
+      "method": "GET",
+      "url": "https://example.test/health",
+      "authentication": {
+        "type": "bearer",
+        "token": "ROB1_AUTH_VALUE_7f4d9a"
+      },
+      "headers": []
+    }
+  ]
+}

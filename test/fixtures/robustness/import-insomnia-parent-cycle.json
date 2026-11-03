@@ -1,0 +1,1 @@
+{"resources":[{"_type":"request_group","_id":"g","parentId":"g"},{"_type":"request","_id":"r","parentId":"g","url":"/ready"}]}

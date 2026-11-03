@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sannr.dev/api/v1/feedback/schema",
+  "title": "Sannr feedback report, v1",
+  "description": "The body POST https://sannr.dev/api/v1/feedback accepts. The Worker enforces exactly this document: a body outside it is a 400 naming the field, with nothing echoed back. Strings are NFC-normalized and stripped of control characters other than newline and tab before validation. The whole body may be at most 32768 bytes. Credential-shaped strings, absolute filesystem paths, .sannr/ paths and URLs outside sannr.dev are rejected wherever they appear.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report", "agent_note", "product"],
+  "properties": {
+    "report": {
+      "description": "The sannr feedback report with anonymize forced on: service names hashed, no paths, no hostnames, no repository name, no evidence or run ids.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["anonymized", "environment", "what_it_found", "did_anything_accumulate", "usage", "questions"],
+      "properties": {
+        "anonymized": { "type": "boolean", "const": true },
+        "generated_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "platform": { "$ref": "#/$defs/token" },
+            "release": { "$ref": "#/$defs/token" },
+            "node": { "$ref": "#/$defs/token" },
+            "host_agents_wired": {
+              "type": "array",
+              "maxItems": 8,
+              "items": { "type": "string", "maxLength": 32, "pattern": "^[a-z0-9-]+$" }
+            },
+            "request_execution": { "type": "boolean" }
+          }
+        },
+        "what_it_found": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "executed_against_a_running_server": { "type": "boolean" },
+            "request_execution_requested": { "type": "boolean" },
+            "request_attempts": { "$ref": "#/$defs/count" },
+            "services": { "$ref": "#/$defs/count" },
+            "documented_operations": { "$ref": "#/$defs/count" },
+            "undocumented_routes": { "$ref": "#/$defs/count" },
+            "edges": { "$ref": "#/$defs/count" },
+            "external_dependencies": { "$ref": "#/$defs/count" },
+            "findings_by_kind": { "$ref": "#/$defs/countMap" },
+            "findings_by_severity": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "high": { "$ref": "#/$defs/count" },
+                "medium": { "$ref": "#/$defs/count" },
+                "low": { "$ref": "#/$defs/count" }
+              }
+            },
+            "service_names": {
+              "type": "array",
+              "maxItems": 256,
+              "items": { "type": "string", "pattern": "^svc-[0-9]{1,5}$" }
+            },
+            "crashed": { "type": "boolean" }
+          }
+        },
+        "did_anything_accumulate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operations_known": { "$ref": "#/$defs/count" },
+            "verified_by_execution": { "$ref": "#/$defs/count" },
+            "gotchas_written": { "$ref": "#/$defs/count" },
+            "verdicts_recorded": { "$ref": "#/$defs/count" },
+            "friction_prompts_fired": { "$ref": "#/$defs/count" }
+          }
+        },
+        "what_it_saved": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "calls": { "$ref": "#/$defs/count" },
+            "tokens_saved": { "$ref": "#/$defs/count" },
+            "calls_where_the_envelope_cost_more": { "$ref": "#/$defs/count" },
+            "gotchas_reused": { "$ref": "#/$defs/count" },
+            "gotchas_delivered_through_grants": { "$ref": "#/$defs/count" },
+            "drift_calls": { "$ref": "#/$defs/count" },
+            "drift_kinds": { "$ref": "#/$defs/countMap" },
+            "friction_captured": { "$ref": "#/$defs/count" }
+          }
+        },
+        "usage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "calls": { "$ref": "#/$defs/count" },
+            "status_classes": {
+              "type": "object",
+              "maxProperties": 8,
+              "propertyNames": { "pattern": "^[0-9?]xx$" },
+              "additionalProperties": { "$ref": "#/$defs/count" }
+            },
+            "machine_wide_calls": { "$ref": "#/$defs/count" }
+          }
+        },
+        "questions": {
+          "description": "The three questions from the feedback file, answered in the agent's own words, plus the two optional sections.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cry_wolf", "new_to_you", "first_ten_minutes"],
+          "properties": {
+            "cry_wolf": { "$ref": "#/$defs/prose" },
+            "new_to_you": { "$ref": "#/$defs/prose" },
+            "first_ten_minutes": { "$ref": "#/$defs/prose" },
+            "wanted_and_could_not": { "$ref": "#/$defs/prose" },
+            "also": { "$ref": "#/$defs/prose" }
+          }
+        }
+      }
+    },
+    "agent_note": {
+      "description": "Free text from the agent, plain text, at most 4000 characters.",
+      "$ref": "#/$defs/prose"
+    },
+    "score": {
+      "description": "Optional. How the session went, 1 (badly) to 10 (well).",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "node", "platform", "host_agent"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[0-9A-Za-z.+-]+$" },
+        "node": { "type": "string", "minLength": 1, "maxLength": 32, "pattern": "^v?[0-9][0-9A-Za-z.+-]*$" },
+        "platform": { "$ref": "#/$defs/token" },
+        "host_agent": { "type": "string", "enum": ["claude-code", "codex", "other"] }
+      }
+    },
+    "target": {
+      "description": "Reserved for the API-owner idea. The only accepted value in v1.",
+      "type": "string",
+      "const": "sannr.dev"
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "minLength": 1, "maxLength": 32, "pattern": "^[A-Za-z0-9._+-]+$" },
+    "count": { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+    "countMap": {
+      "type": "object",
+      "maxProperties": 64,
+      "propertyNames": { "pattern": "^[a-z0-9_-]{1,64}$" },
+      "additionalProperties": { "$ref": "#/$defs/count" }
+    },
+    "prose": { "type": "string", "maxLength": 4000 }
+  }
+}

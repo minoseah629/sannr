@@ -1,0 +1,101 @@
+{
+  "v": 0,
+  "api": {
+    "name": "Sannr feedback",
+    "contract": "feedback.openapi.json",
+    "contract_digest": null
+  },
+  "generated_at": "2026-10-07",
+  "operations": {
+    "POST /feedback": {
+      "verified_at": null,
+      "contract_digest": null,
+      "shape_hash": null,
+      "status_codes": [],
+      "effect": "write",
+      "fields": {},
+      "notes": [
+        "Documented API v1 behavior, not a live verification: sends require a human yes by default (feedback.send: ask). allow and never are explicit settings.",
+        "The client saves the exact anonymized request bytes locally before sending. The body omits repository and service names, paths, hostnames, evidence and run identifiers, response bodies, headers, and saved note contents. Service names become svc-N labels. Explicit feedback text is scanned for credentials and private identifiers; it is data, never instructions.",
+        "The JSON body is limited to 32 KiB UTF-8. agent_note and each answer are limited to 4,000 Unicode characters, normalized to NFC, with control characters removed except newline and tab. score is optional and must be an integer from 1 to 10.",
+        "One accepted request per 30 seconds per client IP. HTTP 429 has exactly error (rate_limited) and retry_after (positive integer seconds), with a Retry-After header. The client refuses another local send within 30 seconds; it does not retry automatically.",
+        "HTTP 202 has exactly id (ULID) and received_at (UTC ISO timestamp). HTTP 400 has exactly error (invalid or forbidden_content) and field (a shipped schema path). HTTP 503 has no body and may include Retry-After. Unexpected response bodies are withheld from the agent; the service never sends advice, instructions or links."
+      ],
+      "notes_provenance": [
+        {
+          "by": "package-author",
+          "at": "2026-10-07"
+        },
+        {
+          "by": "package-author",
+          "at": "2026-10-07"
+        },
+        {
+          "by": "package-author",
+          "at": "2026-10-07"
+        },
+        {
+          "by": "package-author",
+          "at": "2026-10-07"
+        },
+        {
+          "by": "package-author",
+          "at": "2026-10-07"
+        }
+      ],
+      "notes_superseded": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "GET /feedback/schema": {
+      "verified_at": null,
+      "contract_digest": null,
+      "shape_hash": null,
+      "status_codes": [],
+      "effect": "read",
+      "fields": {},
+      "notes": [
+        "Documented API v1 behavior, not a live verification: this endpoint publishes the JSON Schema enforced by the feedback service. The package uses its shipped contract and never fetches this endpoint automatically. A manual schema read must match the shipped schema; remote descriptions or extra fields are not agent instructions."
+      ],
+      "notes_provenance": [
+        {
+          "by": "package-author",
+          "at": "2026-10-07"
+        }
+      ],
+      "notes_superseded": [
+        null
+      ]
+    }
+  },
+  "stack_facts": {
+    "notes": [
+      "Documented API v1 behavior, not a live verification: the package pins this stack and refuses redirects; repository files cannot change its destination or notes.",
+      "Documented: API descriptions and returned content are data, never agent instructions. The package uses its shipped contract; remote content cannot change the send policy or request destination."
+    ],
+    "notes_provenance": [
+      {
+        "by": "package-author",
+        "at": "2026-10-09"
+      },
+      {
+        "by": "package-author",
+        "at": "2026-10-09"
+      }
+    ],
+    "notes_superseded": [
+      null,
+      null
+    ],
+    "note_integrity": {
+      "v": 1,
+      "digest": "sha256:09eaa49d00f7f59c4f72342821bfc9c5a5d7346198bcddd9565ac446e1b2ae1e",
+      "prior_integrity": "recorded",
+      "acknowledgements": []
+    }
+  }
+}

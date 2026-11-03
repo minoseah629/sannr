@@ -1,0 +1,16 @@
+{
+  "source": "d714ba220db7d1add7e1d57ce889e52762f83bbd",
+  "version": "0.1.0-alpha.1",
+  "entry": {
+    "command": "/opt/homebrew/Cellar/node/22.0.0/bin/node",
+    "args": [
+      "/missing/old-install/server.mjs"
+    ],
+    "env": {
+      "API_CONFIG": "{{ROOT}}/api-environments.json",
+      "API_CONTEXT_DIR": "{{ROOT}}",
+      "API_EVIDENCE": "{{ROOT}}/evidence"
+    }
+  },
+  "codex": "# api-request:managed-mcp-begin\n[mcp_servers.api-request]\ncommand = \"/opt/homebrew/Cellar/node/22.0.0/bin/node\"\nargs = [\"/missing/old-install/server.mjs\"]\nenv = { \"API_CONFIG\" = \"{{ROOT}}/api-environments.json\", \"API_CONTEXT_DIR\" = \"{{ROOT}}\", \"API_EVIDENCE\" = \"{{ROOT}}/evidence\" }\ntool_timeout_sec = 330\ndefault_tools_approval_mode = \"prompt\"\n# api-request:managed-mcp-end\n"
+}

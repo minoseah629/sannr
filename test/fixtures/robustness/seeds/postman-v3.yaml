@@ -1,0 +1,15 @@
+collection:
+  info:
+    name: Robustness
+  auth:
+    type: bearer
+    bearer:
+      - key: token
+        value: ROB1_AUTH_VALUE_7f4d9a
+  item:
+    - name: health
+      request:
+        method: GET
+        url: https://example.test/health
+      response:
+        - code: 200

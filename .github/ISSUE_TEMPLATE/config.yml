@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/sannrhq/sannr/blob/main/SECURITY.md
+    about: Do not open a public issue. SECURITY.md explains how to report privately.
+  - name: Question or idea
+    url: https://github.com/sannrhq/sannr/discussions
+    about: Ask how something works or propose an idea before it becomes a bug or feature request.
+  - name: Feedback from inside the tool
+    url: https://github.com/sannrhq/sannr/blob/main/docs/feedback.md
+    about: "`sannr feedback` writes an anonymized usage report; nothing is sent without an explicit send."

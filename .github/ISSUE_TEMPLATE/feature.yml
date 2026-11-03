@@ -1,0 +1,35 @@
+name: Feature request
+description: A capability, protocol, import format or workflow that would help an agent or a person using this tool.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions and early ideas fit better in Discussions. A feature request is clearest
+        when it names the task that is hard today and what a passing result would look like.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The task that is hard today
+      description: What are you or your agent trying to do, and where does it stop or go wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like instead
+      description: The command, tool behavior or recorded output you expect. Mention which surface (CLI, MCP, skills, import, Workbench).
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried or considered
+      description: Workarounds, other tools, or why existing commands do not cover it.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This does not require sending data to a Sannr service or adding telemetry.
+        - label: This respects the promotion boundary (no bodies, headers, credentials or query values in committed files).

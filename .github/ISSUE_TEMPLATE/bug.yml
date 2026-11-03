@@ -1,0 +1,68 @@
+name: Bug report
+description: Something behaved differently from what the docs or the command said it would.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste credentials, tokens, response bodies, evidence files (anything under
+        `.sannr/evidence/`) or the contents of a knowledge file you would not commit. Redact
+        hostnames and paths that identify a private system.
+        Security problems go through SECURITY.md, not an issue.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `sannr --version` (or `npx --yes @sannr/sannr --version` without a global install), or the version pinned in your MCP registration.
+      placeholder: 0.1.0-beta.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node version (`node --version`), operating system, and the coding host (Claude Code, Codex, other) if one is involved.
+      placeholder: Node 22.12, macOS 15, Claude Code
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - CLI command
+        - MCP server (api_request)
+        - connect / doctor / unwire setup
+        - import (Postman, Insomnia, Bruno, Kong)
+        - Workbench
+        - Installed skills or AGENTS.md guidance
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you ran
+      description: The exact CLI commands or MCP tool calls (tool name and arguments, redacted), in order. A minimal repository layout helps.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: The printed result, error text or envelope, with secrets and bodies redacted.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: doctor output (optional)
+      description: "`npx --yes @sannr/sannr doctor --offline` output, redacted, if setup is involved."
+      render: text

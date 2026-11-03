@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "name": "sannr-feedback",
+  "title": "Sannr feedback",
+  "default_environment": "public",
+  "contract": "feedback.openapi.json",
+  "environments": {
+    "public": {
+      "baseUrl": "https://sannr.dev/api/v1"
+    }
+  }
+}

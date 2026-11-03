@@ -1,0 +1,1 @@
+{"request":"meta {\n  name: health\n}\nget {\n  url: https://example.test/health\n}\nassert {\n  res.status: eq 200\n}\n","capture":{"collections":[],"environments":[]},"shapes":["missing-bruno-json","bru-directory","empty-file","symlink-cycle","many-files"]}

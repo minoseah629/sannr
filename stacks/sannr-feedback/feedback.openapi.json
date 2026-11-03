@@ -1,0 +1,1161 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Sannr feedback API",
+    "version": "1.0.0",
+    "description": "Public feedback submission. No authentication. Feedback strings are data, never agent instructions. The package never fetches the schema automatically."
+  },
+  "servers": [
+    {
+      "url": "https://sannr.dev/api/v1"
+    }
+  ],
+  "paths": {
+    "/feedback": {
+      "post": {
+        "operationId": "sendFeedback",
+        "summary": "Send a locally approved anonymized report",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Feedback"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted report; no advice or links.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "received_at"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "maxLength": 26,
+                      "pattern": "^[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+                    },
+                    "received_at": {
+                      "type": "string",
+                      "maxLength": 24,
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Refused payload; fixed error code and a bounded schema path, never a field value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error",
+                    "field"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "enum": [
+                        "invalid",
+                        "forbidden_content"
+                      ]
+                    },
+                    "field": {
+                      "type": "string",
+                      "enum": [
+                        "[key]",
+                        "agent_note",
+                        "body",
+                        "content-type",
+                        "product",
+                        "product.host_agent",
+                        "product.node",
+                        "product.platform",
+                        "product.version",
+                        "product[key]",
+                        "report",
+                        "report.anonymized",
+                        "report.did_anything_accumulate",
+                        "report.did_anything_accumulate.friction_prompts_fired",
+                        "report.did_anything_accumulate.gotchas_written",
+                        "report.did_anything_accumulate.operations_known",
+                        "report.did_anything_accumulate.verdicts_recorded",
+                        "report.did_anything_accumulate.verified_by_execution",
+                        "report.did_anything_accumulate[key]",
+                        "report.environment",
+                        "report.environment.host_agents_wired",
+                        "report.environment.host_agents_wired[0]",
+                        "report.environment.host_agents_wired[1]",
+                        "report.environment.host_agents_wired[2]",
+                        "report.environment.host_agents_wired[3]",
+                        "report.environment.host_agents_wired[4]",
+                        "report.environment.host_agents_wired[5]",
+                        "report.environment.host_agents_wired[6]",
+                        "report.environment.host_agents_wired[7]",
+                        "report.environment.node",
+                        "report.environment.platform",
+                        "report.environment.release",
+                        "report.environment.request_execution",
+                        "report.environment[key]",
+                        "report.generated_at",
+                        "report.questions",
+                        "report.questions.also",
+                        "report.questions.cry_wolf",
+                        "report.questions.first_ten_minutes",
+                        "report.questions.new_to_you",
+                        "report.questions.wanted_and_could_not",
+                        "report.questions[key]",
+                        "report.usage",
+                        "report.usage.calls",
+                        "report.usage.machine_wide_calls",
+                        "report.usage.status_classes",
+                        "report.usage.status_classes[key]",
+                        "report.usage[key]",
+                        "report.what_it_found",
+                        "report.what_it_found.crashed",
+                        "report.what_it_found.documented_operations",
+                        "report.what_it_found.edges",
+                        "report.what_it_found.executed_against_a_running_server",
+                        "report.what_it_found.external_dependencies",
+                        "report.what_it_found.findings_by_kind",
+                        "report.what_it_found.findings_by_kind[key]",
+                        "report.what_it_found.findings_by_severity",
+                        "report.what_it_found.findings_by_severity.high",
+                        "report.what_it_found.findings_by_severity.low",
+                        "report.what_it_found.findings_by_severity.medium",
+                        "report.what_it_found.findings_by_severity[key]",
+                        "report.what_it_found.request_attempts",
+                        "report.what_it_found.request_execution_requested",
+                        "report.what_it_found.service_names",
+                        "report.what_it_found.service_names[0]",
+                        "report.what_it_found.service_names[100]",
+                        "report.what_it_found.service_names[101]",
+                        "report.what_it_found.service_names[102]",
+                        "report.what_it_found.service_names[103]",
+                        "report.what_it_found.service_names[104]",
+                        "report.what_it_found.service_names[105]",
+                        "report.what_it_found.service_names[106]",
+                        "report.what_it_found.service_names[107]",
+                        "report.what_it_found.service_names[108]",
+                        "report.what_it_found.service_names[109]",
+                        "report.what_it_found.service_names[10]",
+                        "report.what_it_found.service_names[110]",
+                        "report.what_it_found.service_names[111]",
+                        "report.what_it_found.service_names[112]",
+                        "report.what_it_found.service_names[113]",
+                        "report.what_it_found.service_names[114]",
+                        "report.what_it_found.service_names[115]",
+                        "report.what_it_found.service_names[116]",
+                        "report.what_it_found.service_names[117]",
+                        "report.what_it_found.service_names[118]",
+                        "report.what_it_found.service_names[119]",
+                        "report.what_it_found.service_names[11]",
+                        "report.what_it_found.service_names[120]",
+                        "report.what_it_found.service_names[121]",
+                        "report.what_it_found.service_names[122]",
+                        "report.what_it_found.service_names[123]",
+                        "report.what_it_found.service_names[124]",
+                        "report.what_it_found.service_names[125]",
+                        "report.what_it_found.service_names[126]",
+                        "report.what_it_found.service_names[127]",
+                        "report.what_it_found.service_names[128]",
+                        "report.what_it_found.service_names[129]",
+                        "report.what_it_found.service_names[12]",
+                        "report.what_it_found.service_names[130]",
+                        "report.what_it_found.service_names[131]",
+                        "report.what_it_found.service_names[132]",
+                        "report.what_it_found.service_names[133]",
+                        "report.what_it_found.service_names[134]",
+                        "report.what_it_found.service_names[135]",
+                        "report.what_it_found.service_names[136]",
+                        "report.what_it_found.service_names[137]",
+                        "report.what_it_found.service_names[138]",
+                        "report.what_it_found.service_names[139]",
+                        "report.what_it_found.service_names[13]",
+                        "report.what_it_found.service_names[140]",
+                        "report.what_it_found.service_names[141]",
+                        "report.what_it_found.service_names[142]",
+                        "report.what_it_found.service_names[143]",
+                        "report.what_it_found.service_names[144]",
+                        "report.what_it_found.service_names[145]",
+                        "report.what_it_found.service_names[146]",
+                        "report.what_it_found.service_names[147]",
+                        "report.what_it_found.service_names[148]",
+                        "report.what_it_found.service_names[149]",
+                        "report.what_it_found.service_names[14]",
+                        "report.what_it_found.service_names[150]",
+                        "report.what_it_found.service_names[151]",
+                        "report.what_it_found.service_names[152]",
+                        "report.what_it_found.service_names[153]",
+                        "report.what_it_found.service_names[154]",
+                        "report.what_it_found.service_names[155]",
+                        "report.what_it_found.service_names[156]",
+                        "report.what_it_found.service_names[157]",
+                        "report.what_it_found.service_names[158]",
+                        "report.what_it_found.service_names[159]",
+                        "report.what_it_found.service_names[15]",
+                        "report.what_it_found.service_names[160]",
+                        "report.what_it_found.service_names[161]",
+                        "report.what_it_found.service_names[162]",
+                        "report.what_it_found.service_names[163]",
+                        "report.what_it_found.service_names[164]",
+                        "report.what_it_found.service_names[165]",
+                        "report.what_it_found.service_names[166]",
+                        "report.what_it_found.service_names[167]",
+                        "report.what_it_found.service_names[168]",
+                        "report.what_it_found.service_names[169]",
+                        "report.what_it_found.service_names[16]",
+                        "report.what_it_found.service_names[170]",
+                        "report.what_it_found.service_names[171]",
+                        "report.what_it_found.service_names[172]",
+                        "report.what_it_found.service_names[173]",
+                        "report.what_it_found.service_names[174]",
+                        "report.what_it_found.service_names[175]",
+                        "report.what_it_found.service_names[176]",
+                        "report.what_it_found.service_names[177]",
+                        "report.what_it_found.service_names[178]",
+                        "report.what_it_found.service_names[179]",
+                        "report.what_it_found.service_names[17]",
+                        "report.what_it_found.service_names[180]",
+                        "report.what_it_found.service_names[181]",
+                        "report.what_it_found.service_names[182]",
+                        "report.what_it_found.service_names[183]",
+                        "report.what_it_found.service_names[184]",
+                        "report.what_it_found.service_names[185]",
+                        "report.what_it_found.service_names[186]",
+                        "report.what_it_found.service_names[187]",
+                        "report.what_it_found.service_names[188]",
+                        "report.what_it_found.service_names[189]",
+                        "report.what_it_found.service_names[18]",
+                        "report.what_it_found.service_names[190]",
+                        "report.what_it_found.service_names[191]",
+                        "report.what_it_found.service_names[192]",
+                        "report.what_it_found.service_names[193]",
+                        "report.what_it_found.service_names[194]",
+                        "report.what_it_found.service_names[195]",
+                        "report.what_it_found.service_names[196]",
+                        "report.what_it_found.service_names[197]",
+                        "report.what_it_found.service_names[198]",
+                        "report.what_it_found.service_names[199]",
+                        "report.what_it_found.service_names[19]",
+                        "report.what_it_found.service_names[1]",
+                        "report.what_it_found.service_names[200]",
+                        "report.what_it_found.service_names[201]",
+                        "report.what_it_found.service_names[202]",
+                        "report.what_it_found.service_names[203]",
+                        "report.what_it_found.service_names[204]",
+                        "report.what_it_found.service_names[205]",
+                        "report.what_it_found.service_names[206]",
+                        "report.what_it_found.service_names[207]",
+                        "report.what_it_found.service_names[208]",
+                        "report.what_it_found.service_names[209]",
+                        "report.what_it_found.service_names[20]",
+                        "report.what_it_found.service_names[210]",
+                        "report.what_it_found.service_names[211]",
+                        "report.what_it_found.service_names[212]",
+                        "report.what_it_found.service_names[213]",
+                        "report.what_it_found.service_names[214]",
+                        "report.what_it_found.service_names[215]",
+                        "report.what_it_found.service_names[216]",
+                        "report.what_it_found.service_names[217]",
+                        "report.what_it_found.service_names[218]",
+                        "report.what_it_found.service_names[219]",
+                        "report.what_it_found.service_names[21]",
+                        "report.what_it_found.service_names[220]",
+                        "report.what_it_found.service_names[221]",
+                        "report.what_it_found.service_names[222]",
+                        "report.what_it_found.service_names[223]",
+                        "report.what_it_found.service_names[224]",
+                        "report.what_it_found.service_names[225]",
+                        "report.what_it_found.service_names[226]",
+                        "report.what_it_found.service_names[227]",
+                        "report.what_it_found.service_names[228]",
+                        "report.what_it_found.service_names[229]",
+                        "report.what_it_found.service_names[22]",
+                        "report.what_it_found.service_names[230]",
+                        "report.what_it_found.service_names[231]",
+                        "report.what_it_found.service_names[232]",
+                        "report.what_it_found.service_names[233]",
+                        "report.what_it_found.service_names[234]",
+                        "report.what_it_found.service_names[235]",
+                        "report.what_it_found.service_names[236]",
+                        "report.what_it_found.service_names[237]",
+                        "report.what_it_found.service_names[238]",
+                        "report.what_it_found.service_names[239]",
+                        "report.what_it_found.service_names[23]",
+                        "report.what_it_found.service_names[240]",
+                        "report.what_it_found.service_names[241]",
+                        "report.what_it_found.service_names[242]",
+                        "report.what_it_found.service_names[243]",
+                        "report.what_it_found.service_names[244]",
+                        "report.what_it_found.service_names[245]",
+                        "report.what_it_found.service_names[246]",
+                        "report.what_it_found.service_names[247]",
+                        "report.what_it_found.service_names[248]",
+                        "report.what_it_found.service_names[249]",
+                        "report.what_it_found.service_names[24]",
+                        "report.what_it_found.service_names[250]",
+                        "report.what_it_found.service_names[251]",
+                        "report.what_it_found.service_names[252]",
+                        "report.what_it_found.service_names[253]",
+                        "report.what_it_found.service_names[254]",
+                        "report.what_it_found.service_names[255]",
+                        "report.what_it_found.service_names[25]",
+                        "report.what_it_found.service_names[26]",
+                        "report.what_it_found.service_names[27]",
+                        "report.what_it_found.service_names[28]",
+                        "report.what_it_found.service_names[29]",
+                        "report.what_it_found.service_names[2]",
+                        "report.what_it_found.service_names[30]",
+                        "report.what_it_found.service_names[31]",
+                        "report.what_it_found.service_names[32]",
+                        "report.what_it_found.service_names[33]",
+                        "report.what_it_found.service_names[34]",
+                        "report.what_it_found.service_names[35]",
+                        "report.what_it_found.service_names[36]",
+                        "report.what_it_found.service_names[37]",
+                        "report.what_it_found.service_names[38]",
+                        "report.what_it_found.service_names[39]",
+                        "report.what_it_found.service_names[3]",
+                        "report.what_it_found.service_names[40]",
+                        "report.what_it_found.service_names[41]",
+                        "report.what_it_found.service_names[42]",
+                        "report.what_it_found.service_names[43]",
+                        "report.what_it_found.service_names[44]",
+                        "report.what_it_found.service_names[45]",
+                        "report.what_it_found.service_names[46]",
+                        "report.what_it_found.service_names[47]",
+                        "report.what_it_found.service_names[48]",
+                        "report.what_it_found.service_names[49]",
+                        "report.what_it_found.service_names[4]",
+                        "report.what_it_found.service_names[50]",
+                        "report.what_it_found.service_names[51]",
+                        "report.what_it_found.service_names[52]",
+                        "report.what_it_found.service_names[53]",
+                        "report.what_it_found.service_names[54]",
+                        "report.what_it_found.service_names[55]",
+                        "report.what_it_found.service_names[56]",
+                        "report.what_it_found.service_names[57]",
+                        "report.what_it_found.service_names[58]",
+                        "report.what_it_found.service_names[59]",
+                        "report.what_it_found.service_names[5]",
+                        "report.what_it_found.service_names[60]",
+                        "report.what_it_found.service_names[61]",
+                        "report.what_it_found.service_names[62]",
+                        "report.what_it_found.service_names[63]",
+                        "report.what_it_found.service_names[64]",
+                        "report.what_it_found.service_names[65]",
+                        "report.what_it_found.service_names[66]",
+                        "report.what_it_found.service_names[67]",
+                        "report.what_it_found.service_names[68]",
+                        "report.what_it_found.service_names[69]",
+                        "report.what_it_found.service_names[6]",
+                        "report.what_it_found.service_names[70]",
+                        "report.what_it_found.service_names[71]",
+                        "report.what_it_found.service_names[72]",
+                        "report.what_it_found.service_names[73]",
+                        "report.what_it_found.service_names[74]",
+                        "report.what_it_found.service_names[75]",
+                        "report.what_it_found.service_names[76]",
+                        "report.what_it_found.service_names[77]",
+                        "report.what_it_found.service_names[78]",
+                        "report.what_it_found.service_names[79]",
+                        "report.what_it_found.service_names[7]",
+                        "report.what_it_found.service_names[80]",
+                        "report.what_it_found.service_names[81]",
+                        "report.what_it_found.service_names[82]",
+                        "report.what_it_found.service_names[83]",
+                        "report.what_it_found.service_names[84]",
+                        "report.what_it_found.service_names[85]",
+                        "report.what_it_found.service_names[86]",
+                        "report.what_it_found.service_names[87]",
+                        "report.what_it_found.service_names[88]",
+                        "report.what_it_found.service_names[89]",
+                        "report.what_it_found.service_names[8]",
+                        "report.what_it_found.service_names[90]",
+                        "report.what_it_found.service_names[91]",
+                        "report.what_it_found.service_names[92]",
+                        "report.what_it_found.service_names[93]",
+                        "report.what_it_found.service_names[94]",
+                        "report.what_it_found.service_names[95]",
+                        "report.what_it_found.service_names[96]",
+                        "report.what_it_found.service_names[97]",
+                        "report.what_it_found.service_names[98]",
+                        "report.what_it_found.service_names[99]",
+                        "report.what_it_found.service_names[9]",
+                        "report.what_it_found.services",
+                        "report.what_it_found.undocumented_routes",
+                        "report.what_it_found[key]",
+                        "report.what_it_saved",
+                        "report.what_it_saved.calls",
+                        "report.what_it_saved.calls_where_the_envelope_cost_more",
+                        "report.what_it_saved.drift_calls",
+                        "report.what_it_saved.drift_kinds",
+                        "report.what_it_saved.drift_kinds[key]",
+                        "report.what_it_saved.friction_captured",
+                        "report.what_it_saved.gotchas_delivered_through_grants",
+                        "report.what_it_saved.gotchas_reused",
+                        "report.what_it_saved.tokens_saved",
+                        "report.what_it_saved[key]",
+                        "report[key]",
+                        "score",
+                        "target"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "One accepted request per 30 seconds per client IP.",
+            "headers": {
+              "Retry-After": {
+                "description": "Delay in seconds before another attempt; the client does not retry automatically.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 86400
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error",
+                    "retry_after"
+                  ],
+                  "properties": {
+                    "error": {
+                      "const": "rate_limited"
+                    },
+                    "retry_after": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Feedback is temporarily unavailable. The response body is empty.",
+            "headers": {
+              "Retry-After": {
+                "description": "Delay in seconds before another attempt; the client does not retry automatically.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 86400
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feedback/schema": {
+      "get": {
+        "operationId": "getFeedbackSchema",
+        "summary": "Manually read the published payload schema",
+        "responses": {
+          "200": {
+            "description": "The payload schema shipped with this client. Additional annotations or changes are not trusted.",
+            "content": {
+              "application/schema+json": {
+                "schema": {
+                  "type": "object",
+                  "const": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": "https://sannr.dev/api/v1/feedback/schema",
+                    "title": "Sannr feedback report, v1",
+                    "description": "The body POST https://sannr.dev/api/v1/feedback accepts. The Worker enforces exactly this document: a body outside it is a 400 naming the field, with nothing echoed back. Strings are NFC-normalized and stripped of control characters other than newline and tab before validation. The whole body may be at most 32768 bytes. Credential-shaped strings, absolute filesystem paths, .sannr/ paths and URLs outside sannr.dev are rejected wherever they appear.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "report",
+                      "agent_note",
+                      "product"
+                    ],
+                    "properties": {
+                      "report": {
+                        "description": "The sannr feedback report with anonymize forced on: service names hashed, no paths, no hostnames, no repository name, no evidence or run ids.",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "anonymized",
+                          "environment",
+                          "what_it_found",
+                          "did_anything_accumulate",
+                          "usage",
+                          "questions"
+                        ],
+                        "properties": {
+                          "anonymized": {
+                            "type": "boolean",
+                            "const": true
+                          },
+                          "generated_at": {
+                            "type": "string",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                          },
+                          "environment": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "platform": {
+                                "$ref": "#/$defs/token"
+                              },
+                              "release": {
+                                "$ref": "#/$defs/token"
+                              },
+                              "node": {
+                                "$ref": "#/$defs/token"
+                              },
+                              "host_agents_wired": {
+                                "type": "array",
+                                "maxItems": 8,
+                                "items": {
+                                  "type": "string",
+                                  "maxLength": 32,
+                                  "pattern": "^[a-z0-9-]+$"
+                                }
+                              },
+                              "request_execution": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "what_it_found": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "executed_against_a_running_server": {
+                                "type": "boolean"
+                              },
+                              "request_execution_requested": {
+                                "type": "boolean"
+                              },
+                              "request_attempts": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "services": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "documented_operations": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "undocumented_routes": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "edges": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "external_dependencies": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "findings_by_kind": {
+                                "$ref": "#/$defs/countMap"
+                              },
+                              "findings_by_severity": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "high": {
+                                    "$ref": "#/$defs/count"
+                                  },
+                                  "medium": {
+                                    "$ref": "#/$defs/count"
+                                  },
+                                  "low": {
+                                    "$ref": "#/$defs/count"
+                                  }
+                                }
+                              },
+                              "service_names": {
+                                "type": "array",
+                                "maxItems": 256,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^svc-[0-9]{1,5}$"
+                                }
+                              },
+                              "crashed": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "did_anything_accumulate": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "operations_known": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "verified_by_execution": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "gotchas_written": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "verdicts_recorded": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "friction_prompts_fired": {
+                                "$ref": "#/$defs/count"
+                              }
+                            }
+                          },
+                          "what_it_saved": {
+                            "type": [
+                              "object",
+                              "null"
+                            ],
+                            "additionalProperties": false,
+                            "properties": {
+                              "calls": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "tokens_saved": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "calls_where_the_envelope_cost_more": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "gotchas_reused": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "gotchas_delivered_through_grants": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "drift_calls": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "drift_kinds": {
+                                "$ref": "#/$defs/countMap"
+                              },
+                              "friction_captured": {
+                                "$ref": "#/$defs/count"
+                              }
+                            }
+                          },
+                          "usage": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "calls": {
+                                "$ref": "#/$defs/count"
+                              },
+                              "status_classes": {
+                                "type": "object",
+                                "maxProperties": 8,
+                                "propertyNames": {
+                                  "pattern": "^[0-9?]xx$"
+                                },
+                                "additionalProperties": {
+                                  "$ref": "#/$defs/count"
+                                }
+                              },
+                              "machine_wide_calls": {
+                                "$ref": "#/$defs/count"
+                              }
+                            }
+                          },
+                          "questions": {
+                            "description": "The three questions from the feedback file, answered in the agent's own words, plus the two optional sections.",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "cry_wolf",
+                              "new_to_you",
+                              "first_ten_minutes"
+                            ],
+                            "properties": {
+                              "cry_wolf": {
+                                "$ref": "#/$defs/prose"
+                              },
+                              "new_to_you": {
+                                "$ref": "#/$defs/prose"
+                              },
+                              "first_ten_minutes": {
+                                "$ref": "#/$defs/prose"
+                              },
+                              "wanted_and_could_not": {
+                                "$ref": "#/$defs/prose"
+                              },
+                              "also": {
+                                "$ref": "#/$defs/prose"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "agent_note": {
+                        "description": "Free text from the agent, plain text, at most 4000 characters.",
+                        "$ref": "#/$defs/prose"
+                      },
+                      "score": {
+                        "description": "Optional. How the session went, 1 (badly) to 10 (well).",
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10
+                      },
+                      "product": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "version",
+                          "node",
+                          "platform",
+                          "host_agent"
+                        ],
+                        "properties": {
+                          "version": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "pattern": "^[0-9A-Za-z.+-]+$"
+                          },
+                          "node": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 32,
+                            "pattern": "^v?[0-9][0-9A-Za-z.+-]*$"
+                          },
+                          "platform": {
+                            "$ref": "#/$defs/token"
+                          },
+                          "host_agent": {
+                            "type": "string",
+                            "enum": [
+                              "claude-code",
+                              "codex",
+                              "other"
+                            ]
+                          }
+                        }
+                      },
+                      "target": {
+                        "description": "Reserved for the API-owner idea. The only accepted value in v1.",
+                        "type": "string",
+                        "const": "sannr.dev"
+                      }
+                    },
+                    "$defs": {
+                      "token": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32,
+                        "pattern": "^[A-Za-z0-9._+-]+$"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "countMap": {
+                        "type": "object",
+                        "maxProperties": 64,
+                        "propertyNames": {
+                          "pattern": "^[a-z0-9_-]{1,64}$"
+                        },
+                        "additionalProperties": {
+                          "$ref": "#/$defs/count"
+                        }
+                      },
+                      "prose": {
+                        "type": "string",
+                        "maxLength": 4000
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Feedback": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://sannr.dev/api/v1/feedback/schema",
+        "title": "Sannr feedback report, v1",
+        "description": "The body POST https://sannr.dev/api/v1/feedback accepts. The Worker enforces exactly this document: a body outside it is a 400 naming the field, with nothing echoed back. Strings are NFC-normalized and stripped of control characters other than newline and tab before validation. The whole body may be at most 32768 bytes. Credential-shaped strings, absolute filesystem paths, .sannr/ paths and URLs outside sannr.dev are rejected wherever they appear.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "report",
+          "agent_note",
+          "product"
+        ],
+        "properties": {
+          "report": {
+            "description": "The sannr feedback report with anonymize forced on: service names hashed, no paths, no hostnames, no repository name, no evidence or run ids.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "anonymized",
+              "environment",
+              "what_it_found",
+              "did_anything_accumulate",
+              "usage",
+              "questions"
+            ],
+            "properties": {
+              "anonymized": {
+                "type": "boolean",
+                "const": true
+              },
+              "generated_at": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+              },
+              "environment": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "platform": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z0-9._+-]+$"
+                  },
+                  "release": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z0-9._+-]+$"
+                  },
+                  "node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z0-9._+-]+$"
+                  },
+                  "host_agents_wired": {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 32,
+                      "pattern": "^[a-z0-9-]+$"
+                    }
+                  },
+                  "request_execution": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "what_it_found": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "executed_against_a_running_server": {
+                    "type": "boolean"
+                  },
+                  "request_execution_requested": {
+                    "type": "boolean"
+                  },
+                  "request_attempts": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "services": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "documented_operations": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "undocumented_routes": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "edges": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "external_dependencies": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "findings_by_kind": {
+                    "type": "object",
+                    "maxProperties": 64,
+                    "propertyNames": {
+                      "pattern": "^[a-z0-9_-]{1,64}$"
+                    },
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000
+                    }
+                  },
+                  "findings_by_severity": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "high": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "medium": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "low": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      }
+                    }
+                  },
+                  "service_names": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^svc-[0-9]{1,5}$"
+                    }
+                  },
+                  "crashed": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "did_anything_accumulate": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "operations_known": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "verified_by_execution": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "gotchas_written": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "verdicts_recorded": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "friction_prompts_fired": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  }
+                }
+              },
+              "what_it_saved": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "calls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "tokens_saved": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "calls_where_the_envelope_cost_more": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "gotchas_reused": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "gotchas_delivered_through_grants": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "drift_calls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "drift_kinds": {
+                    "type": "object",
+                    "maxProperties": 64,
+                    "propertyNames": {
+                      "pattern": "^[a-z0-9_-]{1,64}$"
+                    },
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000
+                    }
+                  },
+                  "friction_captured": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  }
+                }
+              },
+              "usage": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "calls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "status_classes": {
+                    "type": "object",
+                    "maxProperties": 8,
+                    "propertyNames": {
+                      "pattern": "^[0-9?]xx$"
+                    },
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000000000
+                    }
+                  },
+                  "machine_wide_calls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  }
+                }
+              },
+              "questions": {
+                "description": "The three questions from the feedback file, answered in the agent's own words, plus the two optional sections.",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cry_wolf",
+                  "new_to_you",
+                  "first_ten_minutes"
+                ],
+                "properties": {
+                  "cry_wolf": {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  "new_to_you": {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  "first_ten_minutes": {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  "wanted_and_could_not": {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  "also": {
+                    "type": "string",
+                    "maxLength": 4000
+                  }
+                }
+              }
+            }
+          },
+          "agent_note": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "Free text from the agent, plain text, at most 4000 characters."
+          },
+          "score": {
+            "description": "Optional. How the session went, 1 (badly) to 10 (well).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "product": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "version",
+              "node",
+              "platform",
+              "host_agent"
+            ],
+            "properties": {
+              "version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[0-9A-Za-z.+-]+$"
+              },
+              "node": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32,
+                "pattern": "^v?[0-9][0-9A-Za-z.+-]*$"
+              },
+              "platform": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32,
+                "pattern": "^[A-Za-z0-9._+-]+$"
+              },
+              "host_agent": {
+                "type": "string",
+                "enum": [
+                  "claude-code",
+                  "codex",
+                  "other"
+                ]
+              }
+            }
+          },
+          "target": {
+            "description": "Reserved for the API-owner idea. The only accepted value in v1.",
+            "type": "string",
+            "const": "sannr.dev"
+          }
+        }
+      }
+    }
+  }
+}

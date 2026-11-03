@@ -1,0 +1,8 @@
+name: Robustness
+map: {answer: 42, enabled: true}
+items:
+  - first
+  - second
+base: &base
+  host: example.test
+copy: *base

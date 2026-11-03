@@ -1,0 +1,35 @@
+{
+  "info": {
+    "name": "Robustness",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "ROB1_AUTH_VALUE_7f4d9a"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "health",
+      "request": {
+        "method": "GET",
+        "url": "https://example.test/health",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer ROB1_AUTH_VALUE_7f4d9a"
+          }
+        ]
+      },
+      "response": [
+        {
+          "code": 200
+        }
+      ]
+    }
+  ]
+}

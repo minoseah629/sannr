@@ -1,0 +1,57 @@
+{
+  "collections": [
+    {
+      "uid": "c1",
+      "collection": {
+        "info": {
+          "name": "Robustness",
+          "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "ROB1_AUTH_VALUE_7f4d9a"
+            }
+          ]
+        },
+        "item": [
+          {
+            "name": "health",
+            "request": {
+              "method": "GET",
+              "url": "https://example.test/health",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer ROB1_AUTH_VALUE_7f4d9a"
+                }
+              ]
+            },
+            "response": [
+              {
+                "code": 200
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "environments": [
+    {
+      "name": "local",
+      "values": [
+        {
+          "key": "apiToken",
+          "value": "ROB1_AUTH_VALUE_7f4d9a"
+        },
+        {
+          "key": "unusedRegion",
+          "value": "ROB1_ENV_VALUE_7f4d9a"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "name": "@sannr/sannr",
+  "version": "0.1.0-beta.1",
+  "description": "An API client for coding agents, with API knowledge recorded alongside your code.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sannrhq/sannr.git"
+  },
+  "homepage": "https://sannr.dev",
+  "bugs": {
+    "url": "https://github.com/sannrhq/sannr/issues"
+  },
+  "bin": {
+    "sannr": "./bin/cli.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "skill/",
+    "stacks/",
+    "server.mjs",
+    "README.md",
+    "CHANGELOG.md",
+    "SUPPORT.md",
+    "SECURITY.md",
+    "TRADEMARK.md",
+    "docs/README.md",
+    "docs/install.md",
+    "docs/privacy.md",
+    "docs/limitations.md",
+    "docs/troubleshooting.md",
+    "docs/agent-examples.md",
+    "docs/agent-guide.md",
+    "docs/api-call-policy.md",
+    "docs/ci.md",
+    "docs/dependency-graph-design.md",
+    "docs/dependency-graph.md",
+    "docs/discovery.md",
+    "docs/feedback.md",
+    "docs/imports.md",
+    "docs/install-prompt.md",
+    "docs/layout.md",
+    "docs/stacks.md",
+    "docs/survey.md",
+    "docs/mcp.md",
+    "docs/network-behavior.md",
+    "docs/note-history.md",
+    "docs/protocols.md",
+    "docs/quickstart.md",
+    "docs/sessions.md",
+    "docs/saved-requests.md",
+    "docs/workbench.md",
+    "docs/workbench-security.md",
+    "docs/view.md",
+    "LICENSE",
+    "scripts/write-build-id.mjs"
+  ],
+  "scripts": {
+    "test": "node scripts/test-unit.mjs --safety",
+    "test:full": "node scripts/test-unit.mjs",
+    "test:stress": "node test/stress.mjs",
+    "test:truth": "node test/truthful.mjs",
+    "test:robustness:network": "node test/robustness/network-run.mjs",
+    "test:robustness": "node test/robustness/run.mjs",
+    "check": "node test/check.mjs",
+    "prepack": "node scripts/write-build-id.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./lib/client.mjs",
+    "./context": "./lib/context.mjs",
+    "./promote": "./lib/promote.mjs",
+    "./operation-context": "./lib/operation-context.mjs",
+    "./saved-requests": "./lib/saved-requests.mjs"
+  },
+  "main": "./lib/client.mjs",
+  "optionalDependencies": {
+    "@grpc/grpc-js": "1.14.6",
+    "@grpc/proto-loader": "0.8.1",
+    "graphql": "17.0.2",
+    "protobufjs": "8.8.1",
+    "ws": "8.22.0"
+  }
+}

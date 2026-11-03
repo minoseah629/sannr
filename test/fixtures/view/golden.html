@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>sannr view — Fixture inventory</title>
+<style>
+:root{color-scheme:light;--bg:#fbfaf5;--paper:#0b0b0b;--ink:#0b0b0b;--card:#fefdfa;--soft:#3a3934;--muted:#57564f;--line:rgba(11,11,11,.2);--line-strong:#0b0b0b;--faint:rgba(11,11,11,.07);--panel-bg:rgba(11,11,11,.025);--grain-dot:rgba(11,11,11,.08);--accent:#c8f224;--accent-text:#4a5c05;--on-accent:#0b0b0b;--frame:#0b0b0b;--lime:#c8f224;--red:#b32920;--high:#b32920;--med:#4a5c05;--low:#57564f;--alert-bg:#ff4a3d;--on-alert:#0b0b0b}
+:root:has(#report-theme-system:checked){color-scheme:light;--bg:#fbfaf5;--paper:#0b0b0b;--ink:#0b0b0b;--card:#fefdfa;--soft:#3a3934;--muted:#57564f;--line:rgba(11,11,11,.2);--line-strong:#0b0b0b;--faint:rgba(11,11,11,.07);--panel-bg:rgba(11,11,11,.025);--grain-dot:rgba(11,11,11,.08);--accent:#c8f224;--accent-text:#4a5c05;--on-accent:#0b0b0b;--frame:#0b0b0b;--lime:#c8f224;--red:#b32920;--high:#b32920;--med:#4a5c05;--low:#57564f;--alert-bg:#ff4a3d;--on-alert:#0b0b0b}
+@media(prefers-color-scheme:dark){:root:has(#report-theme-system:checked){color-scheme:dark;--bg:#0b0b0b;--paper:#efeee9;--ink:#efeee9;--card:#0b0b0b;--soft:#b8b7b0;--muted:#85847c;--line:rgba(239,238,233,.22);--line-strong:#efeee9;--faint:rgba(239,238,233,.07);--panel-bg:rgba(239,238,233,.025);--grain-dot:rgba(239,238,233,.08);--accent:#c8f224;--accent-text:#c8f224;--on-accent:#0b0b0b;--frame:#c8f224;--lime:#c8f224;--red:#ff4a3d;--high:#ff4a3d;--med:#c8f224;--low:#b8b7b0;--alert-bg:#ff4a3d;--on-alert:#0b0b0b}}
+:root:has(#report-theme-light:checked){color-scheme:light;--bg:#fbfaf5;--paper:#0b0b0b;--ink:#0b0b0b;--card:#fefdfa;--soft:#3a3934;--muted:#57564f;--line:rgba(11,11,11,.2);--line-strong:#0b0b0b;--faint:rgba(11,11,11,.07);--panel-bg:rgba(11,11,11,.025);--grain-dot:rgba(11,11,11,.08);--accent:#c8f224;--accent-text:#4a5c05;--on-accent:#0b0b0b;--frame:#0b0b0b;--lime:#c8f224;--red:#b32920;--high:#b32920;--med:#4a5c05;--low:#57564f;--alert-bg:#ff4a3d;--on-alert:#0b0b0b}
+:root:has(#report-theme-dark:checked){color-scheme:dark;--bg:#0b0b0b;--paper:#efeee9;--ink:#efeee9;--card:#0b0b0b;--soft:#b8b7b0;--muted:#85847c;--line:rgba(239,238,233,.22);--line-strong:#efeee9;--faint:rgba(239,238,233,.07);--panel-bg:rgba(239,238,233,.025);--grain-dot:rgba(239,238,233,.08);--accent:#c8f224;--accent-text:#c8f224;--on-accent:#0b0b0b;--frame:#c8f224;--lime:#c8f224;--red:#ff4a3d;--high:#ff4a3d;--med:#c8f224;--low:#b8b7b0;--alert-bg:#ff4a3d;--on-alert:#0b0b0b}
+.report-theme{display:flex;flex-wrap:wrap;gap:.4rem .75rem;min-width:0;margin:0 0 1.25rem;padding:.35rem .65rem .65rem;border:1px solid var(--line);color:var(--ink);background:var(--card);font:normal .85rem/1.4 system-ui,sans-serif}
+.report-theme legend{padding:0 .3rem;font-size:.8rem;color:var(--muted)}
+.report-theme-choice{display:inline-flex;align-items:center;gap:.35rem;min-width:0}
+.report-theme input{width:1rem;height:1rem;margin:0;accent-color:var(--accent-text);flex:none}
+.report-theme label{display:inline-flex;align-items:center;min-height:2rem;padding:.15rem .5rem;border:1px solid transparent;cursor:pointer;overflow-wrap:anywhere}
+.report-theme input:checked+label{background:var(--accent);color:var(--on-accent);border-color:var(--frame)}
+.report-theme input:focus-visible{outline:2px solid var(--accent-text);outline-offset:3px}
+.report-theme input:focus-visible+label{outline:2px solid var(--accent-text);outline-offset:2px}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,sans-serif;max-width:1100px;margin:auto;padding:24px;overflow-wrap:anywhere}
+h1{font-size:1.5rem}h2{font-size:1.15rem}h3{font-size:1rem}h1,h2,h3,p{margin:0 0 10px}section{margin:28px 0}header,section{scroll-margin-top:16px}
+.basis,.state{color:var(--muted);font-size:.875rem}a{color:inherit}nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin:20px 0}
+details,pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0}summary{cursor:pointer;font-weight:600}details[open]>summary{margin-bottom:12px}
+code,pre{font: .875rem/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}pre{white-space:pre-wrap;overflow-wrap:anywhere}ul{padding-left:22px}li{margin:6px 0}.state{font-weight:400}footer{border-top:1px solid var(--line);padding-top:14px}
+@media(max-width:600px){body{padding:16px}details,pre{padding:10px}}
+.am{--am-ink:var(--ink,#1c1c1a);--am-muted:var(--muted,#666660);--am-line:var(--line,#e4e4df);--am-card:var(--card,#fff);--am-bg:var(--bg,#f7f7f5);color:var(--am-ink)}
+.am h3{font-size:1rem;margin:24px 0 8px}.am h4{font-size:.95rem;margin:16px 0 6px;display:flex;gap:8px;align-items:baseline}.am .am-n{color:var(--am-muted);font-weight:400}
+.am .am-basis{color:var(--am-muted);font-size:.875rem;margin:0 0 6px}.am p{max-width:none}.am p,.am dd,.am h2,.am h4,.am .am-q{overflow-wrap:anywhere}
+.am-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:10px;margin:14px 0}
+.am-tile{min-width:0;overflow-wrap:anywhere;border:1px solid var(--am-line);border-radius:10px;padding:10px 12px;background:var(--am-card)}.am-tile b{display:block;font-size:1.6rem;line-height:1.15}.am-tile span{display:block;color:var(--am-muted);font-size:.8rem}
+.am-legend{display:grid;gap:6px;margin:12px 0}.am-legend>div{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}.am-legend dt{flex:0 1 18rem;min-width:0;max-width:100%}.am-legend dd{flex:1 1 28rem;min-width:0;max-width:100%;margin:0;color:var(--am-muted);font-size:.85rem}
+.am-chip{display:inline-block;box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;padding:0 8px 0 6px;border:1px solid var(--am-line);border-left:4px solid var(--am-hue,var(--am-muted));border-radius:6px;background:color-mix(in srgb,var(--am-hue,var(--am-muted)) 13%,transparent);color:var(--am-ink);font-size:.8rem;line-height:1.6;white-space:normal}
+.am-learned{--am-hue:#3d7fc4}.am-q{display:block;color:var(--am-muted);font-size:.8rem;margin-top:3px}
+.am-s-observed{--am-hue:#2f9e5b}
+.am-s-observed-after-failure{--am-hue:#7fa832}
+.am-s-latest-response{--am-hue:#d14b4b}
+.am-s-no-response{--am-hue:#8a8a83}
+.am-s-write-no-response{--am-hue:#b07d18}
+.am-s-scope-unresolved{--am-hue:#7a6fc0}
+.am-s-unavailable{--am-hue:#d14b4b}
+.am-chip.am-tone-neutral{--am-hue:#8a8a83}
+.am-m{display:inline-block;min-width:4.6em;padding:0 6px;border:1px solid var(--am-line);border-left:4px solid var(--am-hue,var(--am-muted));border-radius:4px;font:600 .72rem/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--am-ink);white-space:nowrap}
+.am-m-get{--am-hue:#3d7fc4}
+.am-m-head{--am-hue:#7a7a74}
+.am-m-post{--am-hue:#2f9e5b}
+.am-m-put{--am-hue:#b07d18}
+.am-m-patch{--am-hue:#b07d18}
+.am-m-delete{--am-hue:#d14b4b}
+.am-m-options{--am-hue:#7a7a74}
+.am-scroll{overflow-x:auto;max-width:100%;border:1px solid var(--am-line);border-radius:10px;background:var(--am-card);margin:6px 0 12px}
+.am table{border-collapse:collapse;width:100%;min-width:40rem;font-size:.85rem}.am th,.am td{text-align:left;padding:7px 10px;border:0;border-bottom:1px solid var(--am-line);vertical-align:top;background:transparent;color:var(--am-ink)}
+.am .am-nw{white-space:nowrap}.am .am-wide{min-width:51.25rem}.am-group table{table-layout:fixed}
+.am-group th:nth-child(1){width:7.5em}.am-group th:nth-child(2){width:36%}.am-group th:nth-child(4){width:6em}.am-group th:nth-child(5){width:5.5em}
+.am th{color:var(--am-muted);font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.am tr:last-child td{border-bottom:0}.am td code{overflow-wrap:anywhere}
+.am-radio{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+.am-filter{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:0;padding:0;margin:8px 0}.am-filter legend{float:left;margin-right:6px;padding:0;color:var(--am-muted);font-size:.8rem}
+.am-filter label{cursor:pointer;padding:1px 10px;border:1px solid var(--am-line);border-radius:999px;font-size:.8rem;background:var(--am-card)}
+#am-method-all:checked~.am-filter label[for="am-method-all"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-all:focus-visible~.am-filter label[for="am-method-all"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-get:checked~.am-filter label[for="am-method-get"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-get:focus-visible~.am-filter label[for="am-method-get"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-get:checked~.am-scroll .am-r:not(.am-row-get){display:none}
+#am-method-head:checked~.am-filter label[for="am-method-head"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-head:focus-visible~.am-filter label[for="am-method-head"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-head:checked~.am-scroll .am-r:not(.am-row-head){display:none}
+#am-method-post:checked~.am-filter label[for="am-method-post"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-post:focus-visible~.am-filter label[for="am-method-post"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-post:checked~.am-scroll .am-r:not(.am-row-post){display:none}
+#am-method-put:checked~.am-filter label[for="am-method-put"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-put:focus-visible~.am-filter label[for="am-method-put"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-put:checked~.am-scroll .am-r:not(.am-row-put){display:none}
+#am-method-patch:checked~.am-filter label[for="am-method-patch"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-patch:focus-visible~.am-filter label[for="am-method-patch"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-patch:checked~.am-scroll .am-r:not(.am-row-patch){display:none}
+#am-method-delete:checked~.am-filter label[for="am-method-delete"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-delete:focus-visible~.am-filter label[for="am-method-delete"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-delete:checked~.am-scroll .am-r:not(.am-row-delete){display:none}
+#am-method-options:checked~.am-filter label[for="am-method-options"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-method-options:focus-visible~.am-filter label[for="am-method-options"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-method-options:checked~.am-scroll .am-r:not(.am-row-options){display:none}
+#am-standing-all:checked~.am-filter label[for="am-standing-all"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-all:focus-visible~.am-filter label[for="am-standing-all"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-observed:checked~.am-filter label[for="am-standing-observed"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-observed:focus-visible~.am-filter label[for="am-standing-observed"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-observed:checked~.am-scroll .am-r:not(.am-row-observed){display:none}
+#am-standing-observed-after-failure:checked~.am-filter label[for="am-standing-observed-after-failure"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-observed-after-failure:focus-visible~.am-filter label[for="am-standing-observed-after-failure"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-observed-after-failure:checked~.am-scroll .am-r:not(.am-row-observed-after-failure){display:none}
+#am-standing-latest-response:checked~.am-filter label[for="am-standing-latest-response"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-latest-response:focus-visible~.am-filter label[for="am-standing-latest-response"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-latest-response:checked~.am-scroll .am-r:not(.am-row-latest-response){display:none}
+#am-standing-no-response:checked~.am-filter label[for="am-standing-no-response"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-no-response:focus-visible~.am-filter label[for="am-standing-no-response"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-no-response:checked~.am-scroll .am-r:not(.am-row-no-response){display:none}
+#am-standing-write-no-response:checked~.am-filter label[for="am-standing-write-no-response"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-write-no-response:focus-visible~.am-filter label[for="am-standing-write-no-response"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-write-no-response:checked~.am-scroll .am-r:not(.am-row-write-no-response){display:none}
+#am-standing-scope-unresolved:checked~.am-filter label[for="am-standing-scope-unresolved"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-scope-unresolved:focus-visible~.am-filter label[for="am-standing-scope-unresolved"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-scope-unresolved:checked~.am-scroll .am-r:not(.am-row-scope-unresolved){display:none}
+#am-standing-unavailable:checked~.am-filter label[for="am-standing-unavailable"]{background:var(--am-ink);color:var(--am-bg);border-color:var(--am-ink)}
+#am-standing-unavailable:focus-visible~.am-filter label[for="am-standing-unavailable"]{outline:2px solid var(--am-ink);outline-offset:2px}
+#am-standing-unavailable:checked~.am-scroll .am-r:not(.am-row-unavailable){display:none}
+</style>
+</head>
+<body>
+<fieldset class="report-theme"><legend>Theme</legend><span class="report-theme-choice"><input type="radio" name="report-theme" id="report-theme-system" checked><label for="report-theme-system">System</label></span><span class="report-theme-choice"><input type="radio" name="report-theme" id="report-theme-light"><label for="report-theme-light">Light</label></span><span class="report-theme-choice"><input type="radio" name="report-theme" id="report-theme-dark"><label for="report-theme-dark">Dark</label></span></fieldset>
+<header><h1>Fixture inventory — sannr view</h1>
+<p id="generated-at">Generated at: 2026-09-08T12:00:00.000Z</p>
+<p>Snapshot of the working tree at commit unavailable &#40;not in git). Local edits may be included. Regenerate to reflect later changes; this page executes nothing.</p>
+<p class="basis">{{CONTEXT_PATH}}, generated 2026-09-07; read 2026-09-08. Standings use the same scoped-observation rules as show; learned verification uses the same store, contract, git and age grading as show and the audit summary.</p></header>
+<nav aria-label="Sections"><a href="#needs-attention">Needs attention</a><a href="#api-map">API map</a><a href="#operations">Operations</a><a href="#verdicts">Verdicts</a><a href="#audit">Audit</a><a href="#map">Map</a><a href="#imports">Imports</a><a href="#mcp">MCP</a><a href="#sessions">Sessions</a><a href="#receipts">Receipts</a><a href="#grants">Grants</a></nav>
+<section id="needs-attention" class="am"><h2>Needs attention</h2><p>1 recorded items; 1 shown; state unavailable.</p><p class="am-basis">Recorded local evidence only; grouped by kind, newest first within each kind. Counts describe attention items, not unique calls. Earlier failures remain after later success.</p><details><summary>Missing receipts · 1</summary><ul><li>not recorded · stack not recorded · <code>operation not recorded</code><p>1 usage-log rows for this project name have no local run receipt. Session, operation and filter applicability are unknown.</p><p class="am-basis">Session: <code>unknown</code>. Basis: source: usage log; legacy project-name scope.</p></li></ul></details><p class="am-basis">Account-fact delivery is not recorded; it is not counted as zero. Host telemetry is not recorded. Usage-log-only receipt gaps are unscoped; they cannot be assigned to a session, operation or selected filter.</p></section>
+<section id="api-map" class="am" aria-labelledby="am-title">
+<h2 id="am-title">Fixture inventory — API map</h2>
+<p class="am-basis">Basis: contract <code>openapi.json</code> (version 1); store <code>{{CONTEXT_PATH}}</code> generated 2026-09-07; no counted responses. Generated 2026-09-08 with evidence from the store and contract, and code locations from local source; nothing was executed.</p>
+<p class="am-basis">Scope unresolved: no base URL is configured; the built-in fallback address is not a scope. Environment default; no response can be counted.</p>
+<div class="am-code"><h3>In the code</h3><p class="am-basis">Declared by code: local signatures and configuration references, not runtime behavior. 0 definition locations; 0 call sites; 0 routes without a stack; 0 hosts without a stack; 3 stack operations without code.</p><h4>Stack operations without a code location</h4><ul><li><code>default</code> · <code>GET /items</code></li><li><code>default</code> · <code>POST /draft</code></li><li><code>default</code> · <code>GET /legacy</code></li></ul></div>
+<p class="am-basis">1 stored operation not in the contract.</p>
+<div class="am-tiles"><div class="am-tile"><b>3</b><span>operations</span></div><div class="am-tile"><b>2</b><span>written</span></div><div class="am-tile"><b>0</b><span>observed</span></div><div class="am-tile"><b>0</b><span>asserted</span></div><div class="am-tile"><b>1</b><span>verified</span></div><div class="am-tile"><b>0</b><span>passing response histories &#40;0 after a failed attempt)</span></div><div class="am-tile"><b>0</b><span>latest response not passing or not counted</span></div><div class="am-tile"><b>0</b><span>reads — no response recorded</span></div><div class="am-tile"><b>0</b><span>writes — no response recorded</span></div><div class="am-tile"><b>3</b><span>scope unresolved</span></div><div class="am-tile"><b>2</b><span>notes</span></div><div class="am-tile"><b>0</b><span>of 0 path keys with a recorded source</span></div></div>
+<p class="am-basis">Evidence classes count each operation once: written declarations or claims without current eligible execution evidence; observed responses without passing assertions; asserted responses with passing client assertions; verified by fresh learn. Observed includes failed responses and is not a success claim. Response history below preserves its separate standing and failure details.</p>
+<dl class="am-legend"><div><dt><span class="am-chip am-s-scope-unresolved">scope unresolved</span></dt><dd>No provider, environment and contract identity could be bound for this operation, so no response can be counted for it. The reason is named beside it.</dd></div><div><dt><span class="am-chip am-learned">learned</span></dt><dd>A legacy learn verification of the contract shape, shown beside the standing and never merged into it.</dd></div></dl>
+<h3>Operations by path</h3>
+<div class="am-group"><h4><code>/items</code> <span class="am-n">1</span></h4><div class="am-scroll"><table><thead><tr><th>method</th><th>path</th><th>evidence class</th><th>response standing</th><th>latest</th><th>notes</th><th>in the code</th></tr></thead><tbody>
+<tr><td class="am-nw"><span class="am-m am-m-get">GET</span></td><td><code>/items</code></td><td><span class="am-chip">verified</span><span class="am-q">fresh-learn</span></td><td><span class="am-chip am-s-scope-unresolved">scope unresolved</span> <span class="am-chip am-learned">learned: verified</span><span class="am-q">no base URL is configured; the built-in fallback address is not a scope</span></td><td class="am-nw">—</td><td>2</td><td><span class="am-q">No matching code location</span></td></tr>
+</tbody></table></div></div>
+<div class="am-group"><h4><code>/draft</code> <span class="am-n">1</span></h4><div class="am-scroll"><table><thead><tr><th>method</th><th>path</th><th>evidence class</th><th>response standing</th><th>latest</th><th>notes</th><th>in the code</th></tr></thead><tbody>
+<tr><td class="am-nw"><span class="am-m am-m-post">POST</span></td><td><code>/draft</code></td><td><span class="am-chip">written</span><span class="am-q">no-base-url</span></td><td><span class="am-chip am-s-scope-unresolved">scope unresolved</span><span class="am-q">no base URL is configured; the built-in fallback address is not a scope</span></td><td class="am-nw">—</td><td>0</td><td><span class="am-q">No matching code location</span></td></tr>
+</tbody></table></div></div>
+<div class="am-group"><h4><code>/legacy</code> <span class="am-n">1</span></h4><div class="am-scroll"><table><thead><tr><th>method</th><th>path</th><th>evidence class</th><th>response standing</th><th>latest</th><th>notes</th><th>in the code</th></tr></thead><tbody>
+<tr><td class="am-nw"><span class="am-m am-m-get">GET</span></td><td><code>/legacy</code></td><td><span class="am-chip">written</span><span class="am-q">no-base-url</span></td><td><span class="am-chip am-s-scope-unresolved">scope unresolved</span> <span class="am-chip am-learned">learned: suspect, age-stale</span><span class="am-q">no base URL is configured; the built-in fallback address is not a scope</span></td><td class="am-nw">—</td><td>0</td><td><span class="am-q">No matching code location</span></td></tr>
+</tbody></table></div></div>
+<h3>Where each path key comes from</h3>
+<p class="am-basis">Basis: one row per path key of the contract &#40;the path prefix that ends in it) with the key-source records on the operations in this scope under it; a key with no record says not recorded. Query keys and every operation&#39;s own records stay in the operation details.</p>
+<p>No contract operation has a path key.</p>
+<h3>Notes</h3>
+<p class="am-basis">Basis: active authored notes in the store, with recorded author, date and evidence run ids.</p>
+<div class="am-scroll"><table><thead><tr><th>operation</th><th>note</th><th>author</th><th>date</th><th>evidence</th></tr></thead><tbody>
+<tr><td><code>GET /items</code></td><td>Use the opaque cursor.</td><td>human</td><td class="am-nw">2026-09-06</td><td>—</td></tr>
+<tr><td><code>GET /items</code></td><td>Keep the response order.</td><td>ci</td><td class="am-nw">2026-09-07</td><td>—</td></tr>
+</tbody></table></div>
+<h3>All operations</h3>
+<div class="am-filters">
+<input type="radio" class="am-radio" name="am-method" id="am-method-all" checked>
+<input type="radio" class="am-radio" name="am-method" id="am-method-get">
+<input type="radio" class="am-radio" name="am-method" id="am-method-post">
+<input type="radio" class="am-radio" name="am-standing" id="am-standing-all" checked>
+<input type="radio" class="am-radio" name="am-standing" id="am-standing-scope-unresolved">
+<fieldset class="am-filter"><legend>Method</legend><label for="am-method-all">all</label><label for="am-method-get">GET</label><label for="am-method-post">POST</label></fieldset>
+<fieldset class="am-filter"><legend>Standing</legend><label for="am-standing-all">all</label><label for="am-standing-scope-unresolved">scope unresolved</label></fieldset>
+<div class="am-scroll"><table class="am-all am-wide"><thead><tr><th>method</th><th>path</th><th>tag</th><th>summary</th><th>evidence class</th><th>response standing</th><th>statuses</th><th>in the code</th></tr></thead><tbody>
+<tr class="am-r am-row-get am-row-scope-unresolved"><td class="am-nw"><span class="am-m am-m-get">GET</span></td><td><code>/items</code></td><td>untagged</td><td></td><td><span class="am-chip">verified</span><span class="am-q">fresh-learn</span></td><td><span class="am-chip am-s-scope-unresolved">scope unresolved</span> <span class="am-chip am-learned">learned: verified</span><span class="am-q">no base URL is configured; the built-in fallback address is not a scope</span></td><td class="am-nw">—</td><td><span class="am-q">No matching code location</span></td></tr>
+<tr class="am-r am-row-post am-row-scope-unresolved"><td class="am-nw"><span class="am-m am-m-post">POST</span></td><td><code>/draft</code></td><td>untagged</td><td></td><td><span class="am-chip">written</span><span class="am-q">no-base-url</span></td><td><span class="am-chip am-s-scope-unresolved">scope unresolved</span><span class="am-q">no base URL is configured; the built-in fallback address is not a scope</span></td><td class="am-nw">—</td><td><span class="am-q">No matching code location</span></td></tr>
+<tr class="am-r am-row-get am-row-scope-unresolved"><td class="am-nw"><span class="am-m am-m-get">GET</span></td><td><code>/legacy</code></td><td>not in the contract</td><td></td><td><span class="am-chip">written</span><span class="am-q">no-base-url</span></td><td><span class="am-chip am-s-scope-unresolved">scope unresolved</span> <span class="am-chip am-learned">learned: suspect, age-stale</span><span class="am-q">no base URL is configured; the built-in fallback address is not a scope</span></td><td class="am-nw">—</td><td><span class="am-q">No matching code location</span></td></tr>
+</tbody></table></div>
+</div>
+<h3>How to read this</h3>
+<p>Each standing is computed from the knowledge store and the contract only, with the rules show uses. No scope could be bound &#40;no base URL is configured; the built-in fallback address is not a scope), so every operation is scope unresolved; show reports the same. A counted response is a client observation in this scope that is complete, has a status, is within the 180-day staleness horizon and whose evidence file still matches its recorded digest; evidence is hashed, never read for content. &quot;using parameters the contract does not declare&quot; names the query parameter names recorded in the request shape of the newest counted request that the contract does not declare for that operation; an operation with a declared parameter that cannot be resolved to a name and location is not checked. &quot;learned&quot; is the legacy learn verification of the contract shape, shown beside and never merged. Notes are active authored notes with their recorded author, date and evidence run ids; they are claims, not verification. Key sources are recorded links from a path or query key to the earlier response field it came from. No request or response values appear on this page; a stored or declared value the secret scan flags reads withheld.</p><dl class="am-legend"><div><dt><span class="am-chip am-s-observed">observed</span></dt><dd>The newest response retained in this scope completed with a 2xx status, every assertion on it passed, and its evidence still matches; no earlier response retained in this scope failed. This is the label show prints; show also prints observed for an operation observed after a failed attempt.</dd></div><div><dt><span class="am-chip am-s-observed-after-failure">observed after a failed attempt</span></dt><dd>Observed, and an earlier response retained in this scope was non-2xx or failed an assertion. When that earlier response cannot be counted, the reason is named.</dd></div><div><dt><span class="am-chip am-s-latest-response">latest response</span></dt><dd>The newest response retained in this scope did not pass &#40;a non-2xx status or a failed assertion) or cannot be counted &#40;older than the staleness horizon, evidence missing or changed, incomplete); nothing passed after it. The reason is named beside the status; a response that did not fail but cannot be counted has a neutral marker.</dd></div><div><dt><span class="am-chip am-s-no-response">no response recorded</span></dt><dd>A read with no response retained in this scope.</dd></div><div><dt><span class="am-chip am-s-write-no-response">write — no response recorded</span></dt><dd>A write &#40;not GET or HEAD) with no response retained in this scope. It may or may not have been sent; nothing in this scope records it.</dd></div><div><dt><span class="am-chip am-s-scope-unresolved">scope unresolved</span></dt><dd>No provider, environment and contract identity could be bound for this operation, so no response can be counted for it. The reason is named beside it.</dd></div><div><dt><span class="am-chip am-s-unavailable">observations unavailable</span></dt><dd>The retained history could not be read completely, or the operation cannot be held as an identity in the store, or its path was withheld; the reason or code is named, so no label is given.</dd></div></dl>
+</section>
+<section id="operations"><h2>Operations</h2><p class="basis">{{CONTEXT_PATH}}, generated 2026-09-07; read 2026-09-08.</p><details id="operation-d2953032e50e71d1ae7dd970c84d06c79f40dc80d6ff39879d401e341de305ef" open><summary><code>GET /items</code> <span class="state">verified · scope unresolved · learned verified</span></summary><p>Measured 2026-09-07T12:00:00.000Z; environment local; verified by ci. Standing: scope unresolved &#40;no base URL is configured; the built-in fallback address is not a scope); no response can be counted in scope.</p><p>Evidence class: verified; fresh-learn.</p><p>verified 2026-09-07; contract unchanged; last confirmed 1 days ago</p><p>Effect: read. Source: not mapped.</p><h3>In the code</h3><span class="am-q">No matching code location</span><h3>Declared response</h3><p>Basis: declared by openapi.json; read 2026-09-08.</p><ul><li><code>$</code>: <code>object</code></li><li><code>$.owner</code>: <code>string</code></li><li><code>$.state</code>: <code>string</code>; declared enum [&quot;ready&quot;,&quot;held&quot;]</li></ul><h3>Measured field names</h3><p>Measured 2026-09-07T12:00:00.000Z; environment local; verified by ci. Standing: scope unresolved &#40;no base URL is configured; the built-in fallback address is not a scope); no response can be counted in scope.</p><ul><li><code>owner</code>: <code>not retained</code>; 2 distinct</li><li><code>state</code>: <code>not retained</code>; 1 distinct</li></ul><h3>Notes</h3><p>History unbaselined: Prior note-history integrity is unknown; reviewed acknowledgement is required before changing it.</p><ul><li><p>Use the opaque cursor.</p><p class="basis">Recorded by human on 2026-09-06. Active note.</p></li><li><p>Keep the response order.</p><p class="basis">Recorded by ci on 2026-09-07; pass ci-pass-17. Active note.</p></li><li><details><summary>Superseded claim — retained history</summary><p>Pagination was unavailable.</p><p class="basis">Recorded by agent on 2026-09-06; learn_reachability_failure. Superseded 2026-09-07T12:00:00.000Z: successful_verification; by ci.</p></details></li></ul><h3>Session evidence</h3><p>At most 20 receipts from the shown session rows, plus shown attention items. 0 ledger rows and 0 attention items were omitted by their display bounds; their operation split is unavailable here.</p><p>No receipt in the shown session rows; this does not establish that no call occurred.</p><p>No attention item in the shown attention projection.</p></details>
+<details id="operation-f818c3e2fe0242fb787275e5205e2e131b6c9fcec848e73536bd022271b9e3f9" open><summary><code>GET /legacy</code> <span class="state">written · scope unresolved · learned suspect · age-stale</span></summary><p>Measured 2025-01-01T12:00:00.000Z; environment not retained; verified by not recorded. Standing: scope unresolved &#40;no base URL is configured; the built-in fallback address is not a scope); no response can be counted in scope.</p><p>Evidence class: written; no-base-url.</p><p>verified 2025-01-01; response shape hash diverged from the recorded baseline &#40;observed 2026-09-07); last confirmed 615 days ago, past the 180-day staleness horizon &#40;source-independent: the API may have moved under an unchanged client)</p><p>Effect: read. Source: not mapped.</p><h3>In the code</h3><span class="am-q">No matching code location</span><h3>Declared response</h3><p>Basis: declared by openapi.json; read 2026-09-08.</p><p>No declared response fields recorded.</p><h3>Measured field names</h3><p>Measured 2025-01-01T12:00:00.000Z; environment not retained; verified by not recorded. Standing: scope unresolved &#40;no base URL is configured; the built-in fallback address is not a scope); no response can be counted in scope.</p><p>No measured field structure retained.</p><h3>Notes</h3><p>No notes recorded; provenance and date unavailable.</p><h3>Session evidence</h3><p>At most 20 receipts from the shown session rows, plus shown attention items. 0 ledger rows and 0 attention items were omitted by their display bounds; their operation split is unavailable here.</p><p>No receipt in the shown session rows; this does not establish that no call occurred.</p><p>No attention item in the shown attention projection.</p></details>
+<details id="operation-6676c2d9204c09cbf273d486980039bc2abc93d617c331814b197ffed182c1d0" open><summary><code>POST /draft</code> <span class="state">written · scope unresolved · learned unverified</span></summary><p>Standing: scope unresolved &#40;no base URL is configured; the built-in fallback address is not a scope); no response can be counted in scope.</p><p>Evidence class: written; no-base-url.</p><p>no execution verification recorded in this context</p><p>Effect: write. Source: not mapped.</p><h3>In the code</h3><span class="am-q">No matching code location</span><h3>Declared response</h3><p>Basis: declared by openapi.json; read 2026-09-08.</p><p>No declared response fields recorded.</p><h3>Measured field names</h3><p>Standing: scope unresolved &#40;no base URL is configured; the built-in fallback address is not a scope); no response can be counted in scope.</p><p>No learned field structure retained.</p><h3>Notes</h3><p>No notes recorded; provenance and date unavailable.</p><h3>Session evidence</h3><p>At most 20 receipts from the shown session rows, plus shown attention items. 0 ledger rows and 0 attention items were omitted by their display bounds; their operation split is unavailable here.</p><p>No receipt in the shown session rows; this does not establish that no call occurred.</p><p>No attention item in the shown attention projection.</p></details></section>
+<section id="verdicts"><h2>Verdicts</h2><p class="basis">{{CONTEXT_PATH}}, generated 2026-09-07; read 2026-09-08. Decisions are recorded opinions; a verdict is not proof of execution.</p><ul><li><p>POST /draft: rejected [structural] — No idempotency declaration. [recorded by human on 2026-09-07]</p><p>Last confirmed: 2026-09-07.</p></li></ul></section>
+<section id="audit"><h2>Last audit &amp; accepted baseline</h2><p class="basis">Basis: accepted audit baseline dated 2026-09-06; saved summary 2026-09-07T14:00:00.000Z.</p><p>Accepted baseline: 2026-09-06.</p><ul><li>inventory · GET /items · schema-mismatch · high</li></ul><p>Fixture audit: 2 responses recorded against env local; 2026-09-07T14:00:00.000Z; commit 1111111111111111111111111111111111111111.</p><pre>## API audit CI summary
+
+**Mode:** report-only
+**Baseline:** 2026-09-06
+**Result:** 1 new, 1 resolved, 1 accepted unchanged.
+
+### New findings
+
+| Operation | Kind | Where |
+| --- | --- | --- |
+| GET /new | missing | inventory |
+
+### Resolved since baseline
+
+| Operation | Kind | Where |
+| --- | --- | --- |
+| GET /old | missing | inventory |
+
+### Local repair loop
+
+Fix code/spec locally, then regenerate and review the accepted state with:
+
+`sannr audit . --baseline --no-execute`
+
+Then verify the enforcing gate with:
+
+`sannr audit . --ci --no-execute`
+
+## Freshness
+
+1 stale or unverified claim need attention.
+
+| Operation | State | Why | Where |
+| --- | --- | --- | --- |
+| POST /draft | unverified | never executed | inventory |
+</pre></section>
+<section id="map"><h2>Estate map</h2><p class="basis">Fixture map from declarations and 2 recorded responses against env local; 2026-09-07T14:00:00.000Z; commit 1111111111111111111111111111111111111111. Same map text renderer, complete detail; finding values withheld.</p><pre>API footprint — fixture-project
+  1 services   2 operations   1 edges   0 shadow routes   1 disagreement   &#40;1 high)   probe coverage not recorded
+
+  services &amp; ownership:
+    inventory: 2 operations; documented; repo inventory; owner human
+
+  frontend  → inventory &#40;1 op)
+
+    frontend → inventory; declared in src/client.mjs
+      declared calls: GET /items
+  contract vs server:
+    high    inventory  GET /items                  schema-mismatch
+
+  external dependencies &#40;outside scanned services):
+    No external dependencies recorded.
+  platform conventions:
+    No platform convention disagreements recorded.</pre></section>
+<section id="imports"><h2>Import loss reports</h2><p class="basis">Basis: saved import reports and source provenance; read 2026-09-08.</p><details open><summary>collection</summary><p>Imported collection; not executed; 2026-09-07T14:00:00.000Z; commit 1111111111111111111111111111111111111111.</p><p>Import classifications are declared or inferred, not executions.</p><pre># import report — collection
+
+3 items: **2 imported**, 1 in the todo file.
+Assertions: 1 translated from tests, 1 derived from saved examples.
+1 script&#40;s) need manual conversion. 0 secret&#40;s) omitted by design &#40;references only).
+Dialects: modern 0 translated / 0 quarantined; legacy 0 translated / 0 quarantined.
+Dialect coverage: 0 translated / 0 quarantined &#40;ratio 0).
+Quarantine: test — unsupported dynamic expression [item-3]
+
+Environment values withheld from this snapshot.
+
+| item | status | notes |
+|---|---|---|
+| item-1 | imported | translated assertion |
+| item-2 | imported | inferred from example |
+| item-3 | todo | NO&amp;#95;ASSERTIONS: no supported assertion |
+
+Run it: `sannr suite run collection` — executed through the same engine as everything else, with evidence.
+Todo steps live in {{SUITES_PATH}}/collection.todo.json; give each an expect and move it over.</pre></details>
+<p>legacy: bruno, imported 2026-08-01. No loss report retained; translated, inferred and quarantined counts are unknown.</p></section>
+<section id="mcp"><h2>MCP servers</h2><p class="basis">{{CONTEXT_PATH}}, generated 2026-09-07; read 2026-09-08. Each retained inspection carries its own date and declaration diff.</p><details><summary>catalog · 2026-09-07T13:00:00.000Z</summary><p>Basis: stored MCP inspection 2026-09-07T13:00:00.000Z; declarations are server claims. 1 tool calls recorded.</p><pre>MCP inspection
+Server: catalog-tools 1
+Label: catalog
+Protocol: 2025-06-18 | Transport: stdio | Initialized: yes
+Capabilities &#40;declared): {&quot;experimental&quot;:{&quot;internal&quot;:&quot;value withheld&quot;},&quot;tools&quot;:{}}
+Instructions &#40;server-provided): The server claims read-only inventory access.
+Annotations are server claims; they do not establish safety.
+malformed_frames: 0
+
+Tools &#40;1)
+
+| Tool | Hints &#40;server claims) | Required inputs | Optional inputs | Output schema |
+| --- | --- | --- | --- | --- |
+| list_items | claims read-only; no destructive claim; no idempotent claim; no open-world claim | — | cursor: string | declared |
+
+Resources: not declared by this server
+
+Prompts: not declared by this server
+
+Tool calls executed: 1
+Observed list_items: result_kind&#61;object; matches_output_schema&#61;true; missing&#61;none; unexpected&#61;none
+  Measured fields: items: array
+
+since 2026-09-06T13:00:00.000Z: declaration changes
+tools changed: list_items — input field added: cursor
+</pre></details></section>
+<section id="sessions" class="am" aria-labelledby="sessions-title"><h2 id="sessions-title">Sessions</h2><p class="am-basis">Basis: local files only; no request made. Evidence directories: .sannr/evidence; 0 run files, 0 envelope outcome records, 0 draft records, 1 knowledge file; usage log rows matched by run id: 0. 1 usage-log row for this project name has no run file here and is not listed.</p><p>No calls recorded yet. Calls made through the MCP tool api_request or the request, protocol, learn, suite and verify commands write private run files under .sannr/evidence/ &#40;one folder per stack). Each one becomes a row here; nothing is sent to build this ledger.</p></section>
+<section id="receipts"><h2>Repository receipts</h2><p class="basis">Basis: usage logs scoped by project name, as receipt does; read sources: override &#40;2 machine-wide rows); 2026-09-07T14:00:00.000Z to 2026-09-07T14:00:00.000Z. Equal repository basenames share this legacy scope.</p><p>1 calls recorded; 2 gotchas delivered in 1 calls.</p><ul><li>GET /items: 2 notes delivered in 1 calls.</li></ul></section>
+<section id="grants"><h2>Registry grants by name</h2><p class="basis">Basis: registry read 2026-09-08; grant dates below. Names only; provider stores are not read.</p><ul><li>inventory may read billing; granted 2026-09-06T12:00:00.000Z.</li></ul></section>
+<footer><p>Snapshot only. Run sannr view again to regenerate. Field names, types, declared enums, notes and verdicts appear; request and response values do not.</p></footer>
+</body>
+</html>

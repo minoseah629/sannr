@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-product="__PRODUCT__">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>__PRODUCT__ Workbench</title>
+  <link rel="stylesheet" href="/workbench.css">
+  <script src="/workbench.js" type="module"></script>
+</head>
+<body>
+  <div id="pairing" class="pairing">
+    <div class="pair-card">
+      <div class="pair-title">__PRODUCT__ Workbench</div>
+      <p class="pair-lead">Pair this browser with the terminal where you launched the workbench. Opening a page never sends an API request.</p>
+      <div class="pair-code-box">
+        <div id="pair-status" role="status">Preparing a pairing code…</div>
+        <button id="pair-copy" class="pair-copy" type="button" aria-label="Copy pairing code" title="Copy pairing code" hidden>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
+        <span id="pair-copied" class="pair-copied" role="status"></span>
+      </div>
+      <p class="pair-hint" id="pair-instructions" hidden>Enter this code at the <strong>Pairing code:</strong> prompt in your terminal. The local URL alone grants no access.</p>
+      <div class="pair-actions"><button id="pair-again" class="btn" type="button">Get a new code</button></div>
+    </div>
+  </div>
+  <div id="app" class="app" hidden></div>
+</body>
+</html>

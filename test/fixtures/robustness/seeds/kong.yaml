@@ -1,0 +1,16 @@
+_format_version: "3.0"
+services:
+  - name: health
+    url: https://example.test
+    routes:
+      - name: health
+        methods: [GET]
+        paths: [/health]
+consumers:
+  - username: synthetic
+    keyauth_credentials:
+      - key: ROB1_AUTH_VALUE_7f4d9a
+plugins:
+  - name: key-auth
+    config:
+      secret: ROB1_ENV_VALUE_7f4d9a

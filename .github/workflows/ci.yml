@@ -1,0 +1,85 @@
+# Routine CI runs core safety only; full qualification is an explicit manual
+# dispatch or a release gate. No artifacts, release or publication here.
+# Keep Package gates as the existing required check name on main.
+# Windows job removed: its serial full suite did not finish within the runner timeout.
+# Reintroduce it with bounded shards and a complete failure summary; launch support
+# remains macOS/Linux until a Windows measurement completes.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Run all product regressions, truth, and local stress instead of core safety
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: Package gates (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - name: Check out the source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install pinned runtime dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Dependency vulnerability report (non-blocking)
+        continue-on-error: true
+        run: npm audit
+      - name: Core safety (not full qualification)
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.full) }}
+        shell: bash
+        run: |
+          npm test 2>&1 | tee unit.log
+          {
+            echo "### Core safety only — Node ${{ matrix.node }}"
+            grep -E '^(ℹ|#) (tests|pass|fail|skipped)' unit.log | sed -E 's/^(ℹ|#) /- /'
+            echo
+            echo "Skipped on this runner (a skip is a claim this run did not check):"
+            grep -E '^﹣|# SKIP' unit.log | sed -E 's/^﹣ /- /' || echo "- none"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Protocol adapter integrity
+        # The core safety set never loads the optional adapters. A dependency
+        # bump that skips scripts/pin-runtime-dependencies.mjs would pass it and
+        # still refuse every gRPC or WebSocket call with PROTOCOL_PACKAGE_INTEGRITY.
+        run: node --test test/protocol-grpc.test.mjs test/protocol-client.test.mjs test/protocol-declaration-dependencies.test.mjs test/alpha-protocol-boundaries.test.mjs
+      - name: Product regression suite (explicit opt-in)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.full }}
+        shell: bash
+        run: |
+          npm run test:full 2>&1 | tee unit.log
+          {
+            echo "### Product regression suite — Node ${{ matrix.node }}"
+            grep -E '^(ℹ|#) (tests|pass|fail|skipped)' unit.log | sed -E 's/^(ℹ|#) /- /'
+            echo "Skipped on this runner (not checked):"
+            grep -E '^﹣|# SKIP' unit.log | sed -E 's/^﹣ /- /' || echo "- none"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Truth gate
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.full }}
+        run: npm run test:truth
+      - name: Stress check (local mode)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.full }}
+        env:
+          SANNR_STRESS_LOCAL: "1"
+        run: npm run test:stress
+      - name: Gate summary
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.full }}
+        run: echo 'Passed unit tests, truth gate, and stress check (local mode; offline fixture only).' >> "$GITHUB_STEP_SUMMARY"

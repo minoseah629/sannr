@@ -1,0 +1,43 @@
+# generated-workflow: ci-artifact-pair-v1
+# generated-product: "sannr"
+# generated-body-sha256: fa85ab455377c95ab8f11ad7c6ad688137cf2a90e5b304741eab463670783a21
+# generated-tarball-sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+name: sannr API audit
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 9 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: sannr CI report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source for sannr
+        uses: actions/checkout@v4
+      - name: Set up Node for sannr
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install sannr from the vendored engine
+        run: npm install --ignore-scripts --no-audit --no-fund --offline --no-save "./vendor/sannr-ci.tgz"
+      - name: sannr push and pull request audit
+        if: github.event_name != 'schedule'
+        run: ./node_modules/.bin/sannr audit . --ci --report-only --summary "$GITHUB_STEP_SUMMARY" --no-execute
+      - name: sannr weekly freshness report
+        if: github.event_name == 'schedule'
+        run: ./node_modules/.bin/sannr audit . --ci --report-only --summary "$GITHUB_STEP_SUMMARY" --no-execute
+
+      # Enforcing mode stays disabled until MAR-596 is closed. Then remove
+      # only --report-only; do not change the no-traffic or summary boundaries.
+      # - name: sannr enforcing audit after MAR-596
+      #   run: ./node_modules/.bin/sannr audit . --ci --summary "$GITHUB_STEP_SUMMARY" --no-execute
+
+      # Organization-internal alternative (comment only; never the default):
+      # with a read-only organization token in NODE_AUTH_TOKEN, replace the
+      # vendored install with: npm install --ignore-scripts --no-save github:sannrhq/sannr#<sha>

@@ -1,0 +1,71 @@
+meta {
+  name: chain-targets
+  type: http
+  seq: 1
+}
+
+get {
+  url: /things
+  body: none
+  auth: none
+}
+
+assert {
+  res.body.count: gte 1
+  res.body.count: lte 9
+  res.body.message: contains a.b*c
+  res.body.name: eq ok
+}
+
+tests {
+  test("status is not 500", function() {
+    expect(res.status).to.not.equal(500);
+  });
+  test("status is a success", function() {
+    expect(res.status).to.be.above(199);
+    expect(res.status).to.be.below(300);
+  });
+  test("status is exactly 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("status is truthy", function() {
+    expect(res.status).to.be.true;
+  });
+  test("status has a length", function() {
+    expect(res.status).to.have.length(3);
+  });
+  test("status is a number", function() {
+    expect(res.status).to.be.a("number");
+  });
+  test("status exists", function() {
+    expect(res.status).to.exist;
+  });
+  test("content type is not text", function() {
+    expect(res.getHeader("Content-Type")).to.not.equal("text/plain");
+  });
+  test("content type is json", function() {
+    expect(res.getHeader("Content-Type")).to.include("json");
+  });
+  test("header is truthy", function() {
+    expect(res.getHeader("X-Flag")).to.be.true;
+  });
+  test("header is long", function() {
+    expect(res.getHeader("X-Flag")).to.have.length(3);
+  });
+  test("header is a string", function() {
+    expect(res.getHeader("X-Flag")).to.be.a("string");
+  });
+  test("header is above one", function() {
+    expect(res.getHeader("X-Flag")).to.be.above(1);
+  });
+  test("empty header name", function() {
+    expect(res.getHeader("")).to.equal("x");
+  });
+  test("body number is in range", function() {
+    expect(res.body.n).to.be.above(1);
+    expect(res.body.n).to.be.below(9);
+  });
+  test("body flag is true", function() {
+    expect(res.body.ok).to.be.true;
+  });
+}

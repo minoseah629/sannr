@@ -1,0 +1,11 @@
+{
+  "type": "environment.insomnia.rest/5.0",
+  "name": "Robustness",
+  "environments": {
+    "name": "local",
+    "data": {
+      "apiToken": "ROB1_AUTH_VALUE_7f4d9a",
+      "unusedRegion": "ROB1_ENV_VALUE_7f4d9a"
+    }
+  }
+}

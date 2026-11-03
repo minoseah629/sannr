@@ -1,0 +1,164 @@
+---
+name: {{PRODUCT}}-write
+description: >-
+  Load this in any repo that carries {{CONTEXT_PATH}}. It is the team's write
+  convention for API knowledge: retrieve relevant prior context, promptly
+  record reusable behavior or corrections with existing evidence, and check
+  the handoff receipt. Use alongside {{PRODUCT}}-request, which routes repo APIs and
+  integrations through Sannr and records scoped observations.
+---
+
+# {{PRODUCT}}-write — record what the spec does not say
+
+**When you learn reusable API behavior absent from the spec, you MUST record
+it before moving on.** Use this workflow:
+
+1. Retrieve inherited context for the operation and environment before
+   rediscovery. Inspect referenced evidence when useful; saved lessons are
+   scoped claims, not proof of current behavior.
+2. While working on and verifying the requested task, preserve the original API
+   evidence, including responses from a program you run, while it is available.
+3. Promptly record one concise lesson or correction with its existing evidence.
+   Prefer the observation receipt below so Sannr handles identity, scope, time
+   and evidence linkage. Preserve older claims and explain contradictions.
+4. Check that the lesson was saved and any configured snapshot was written.
+   Use the team's Git/CI workflow to deliver it and its referenced evidence;
+   a local save alone does not establish that another repo can retrieve it.
+
+The `{{PRODUCT}}-request` convention routes agent-issued calls to this repository's
+APIs and integrations through Sannr, including routine calls and health checks.
+Automatic capture preserves bounded observations; it does not infer a reusable
+lesson or prove an author's explanation. This skill supplies the explicit write
+that makes such a lesson available to later agents.
+Automatic observations already retain response shapes. Avoid a second note that
+merely repeats those shapes; record the behavioral implication or decision the
+next agent needs.
+
+## When the write triggers
+
+Any of these is a trigger. The test is always the same: the spec does not say
+it, and you now know it.
+
+- **An undocumented required field** — the server 400s without a field the
+  contract marks optional or does not list at all.
+- **A state precondition** — the call only works when the resource is already
+  in some state ("transition requires status=draft first").
+- **A field that lies** — the docs say one thing, the server does another
+  (a documented enum value that never occurs, a "timestamp" that is a string,
+  a pagination cursor that is not opaque after all).
+- **A rejected integration and why** — you evaluated an API or endpoint and
+  decided NOT to use it. Accepted integrations leave code behind; rejected
+  ones leave nothing unless you write the verdict.
+
+Not triggers: things the spec already says (that is what the spec is for),
+transient failures (a 503 is weather, not knowledge), and anything containing
+a secret (the file is committed; the guard will refuse and you rephrase by
+shape: "needs a bearer token from the console", never the token).
+
+## The exact write
+
+If the repo exposes `api_context_record`, prefer the successful local
+`context_capture` receipt when recording a lesson from that request:
+
+```json
+{"observation_id":"<actual observation_id>","operation_id":"<actual operation_id>","note":"One reusable lesson, with its uncertainty."}
+```
+
+Sannr attaches the saved observation's exact provider, operation, environment,
+contract identity, original time and evidence. `operation_id` is optional;
+include it from the same receipt when available. These are capture identities,
+not the private evidence run ID. Do not reconstruct evidence paths or override
+scope or time in this form. The tool checks that evidence still matches its
+saved digest; linking old evidence does not renew its applicability.
+
+A consumer can record knowledge about its declared provider without owning
+that provider's repo. The explanation remains an authored claim; linking an
+observation does not execute the API or independently verify the explanation.
+Retrieve the applicable prior context first and state changed assumptions or
+contradictory evidence explicitly instead of silently rewriting history.
+
+Keep **when** and **where** each claim applies explicit. State what the latest
+applicable observation showed and when; call it current only when its freshness
+supports that claim. Describe older records in the past tense,
+with their dates or evidence references when available. Different historical
+responses do not establish that the current API alternates between behaviors.
+For example: "Earlier responses used an offset; the latest staging response
+uses a cursor; the transition date is unknown." Claim current variability only
+when comparable current requests actually demonstrate it.
+
+Distinguish the configured provider from source code, a test fixture or a local
+server you started. For example: "The local test server accepts the new filter;
+the configured staging provider has not been checked." Passing local tests does
+not establish that a deployed provider runs those bytes. Retain the actual
+target and environment of the evidence, and leave deployment equivalence
+unresolved unless supported. Tribal knowledge without execution evidence is
+still worth recording: attribute it to its source, state what is unverified,
+and keep it an authored claim.
+
+For a lesson without a local client observation, use the explicit
+`node`, `operation`, `note` form with the actual environment and protocol.
+Attribute tribal or imported knowledge and preserve its original `observed_at`
+when known. Imported catalog IDs are not local observation handles. For available
+local evidence, including request/response artifacts retained by your program,
+pass the actual repository-relative file path, such as
+`{"path":"{{EVIDENCE_PATH}}/run-<id>.json","locator":"/response/body/counts"}`.
+For client evidence, use the actual run ID returned by `api_request.evidence`
+and its configured evidence directory (normally `{{EVIDENCE_PATH}}/`). Preserve method, target, relevant
+request and response details in the original evidence artifact, not in shared
+lesson prose. Do not reconstruct discarded responses or call the API again
+just to obtain an observation handle. The optional locator is a JSON pointer
+inside that file, not a run ID or dotted field name. If recording fails,
+correct the reference using the tool's guidance; retain available evidence.
+Preserve missing or changed evidence as a reported limitation. Do not refresh a
+digest, drop a failing evidence link, or rerun the API merely to repair bookkeeping.
+An evidence link supports inspection but does not verify the authored claim.
+
+If the team configures `context.snapshot` in `{{GRAPH_MANIFEST_PATH}}`, recording a
+lesson also refreshes that local Git/CI snapshot. Check the receipt: a saved
+lesson with a failed or limited snapshot is an incomplete handoff. Repair the
+destination or export limitation without recording the lesson again. Git/CI
+delivery and sharing referenced evidence remain the team's configured workflow.
+
+For legacy HTTP context, **a gotcha** (the first three triggers) is one `note`:
+
+```
+sannr note "<METHOD /path>" "<one sentence>"
+```
+
+Structure, so every write reads the same three years on:
+
+- The operation is `METHOD /path` exactly as the contract spells it
+  (`"POST /orders/{id}/transition"`) — method uppercase, path with its
+  placeholders, nothing else. Never a full URL.
+- The note is **one sentence**, naming the field or status and using a tense
+  that matches its evidence, symptom first then a supported cause or fix:
+  - `sannr note "POST /orders" "400s without idempotency_key, which the contract marks optional"`
+  - `sannr note "GET /users" "returns disabled accounts too; filter on status yourself"`
+  - `sannr note "GET /orders" "cursor is opaque; decoding it breaks on deploy"`
+- One fact per note. Two facts are two notes.
+
+**A rejected integration** (the fourth trigger) is one `verdict`:
+
+```
+sannr verdict "<what>" --verdict rejected --reason "<one sentence, by shape not value>" --class <class> [--probe {{SUITES_PATH}}/<name>.json]
+```
+
+- `<what>` names the API or operation evaluated (`"POST /refunds"`,
+  `"vendor-x billing API"`).
+- `--class` is one of `measured | documented | priced | structural |
+  contextual | judgment` — it tells the next reader HOW to re-check the
+  decision, which prose never does.
+- `--probe` points at a committed envelope that reproduces the reason, when
+  one exists. A verdict with a probe is re-checkable in one command; without
+  one it is an opinion with a date on it.
+- `--verdict accepted` and `deferred` exist too; the write is mandatory for
+  *rejected*, because rejection is the decision that otherwise leaves no trace.
+
+## Why this is hard-lined
+
+Voluntary mid-task capture has no replicated, checked-in measurement in this
+repository, so the convention does not depend on it. The deterministic paths
+(the client's structural observations and friction signals, `learn --ci`)
+retain or surface what a machine can see;
+declared and decisional knowledge requires an explicit write, so that is what
+the convention mandates. This is a design rule, not a measured adoption result.

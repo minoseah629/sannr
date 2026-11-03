@@ -1,0 +1,16 @@
+meta {
+  name: health
+  type: http
+  seq: 1
+}
+get {
+  url: https://example.test/health
+  body: none
+  auth: bearer
+}
+auth:bearer {
+  token: ROB1_AUTH_VALUE_7f4d9a
+}
+assert {
+  res.status: eq 200
+}
