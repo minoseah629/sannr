@@ -128,8 +128,8 @@ that stack's default environment and the same observation rules as scoped
 `show`; observations and verified executions remain separate. The viewport
 reads its store and contract, withholds unsafe values and counts them, and
 renders without scripts under the page's Content-Security-Policy.
-Cross-repository stack sharing is separate work; older grant-based context
-reads retain their existing boundary. Private evidence can contain response
+`stack import` copies a stack from another repository (see below); older
+grant-based context reads retain their existing boundary. Private evidence can contain response
 values; Git ignore rules do not protect copied or uploaded folders.
 
 Stack-wide lessons use `sannr note --stack <name> --scope stack "<lesson>"`.
@@ -144,6 +144,121 @@ contract identity, freshness and evidence checks are shared by `stacks`, `show`,
 managed instructions, map/view and the local feedback report. Observed includes
 failed responses; it is not a success count. See [note history](note-history.md)
 for ranking, contradiction flags and explicit draft-note acceptance.
+
+## Import a stack from another repository
+
+`stack import` installs a stack that another repository already keeps: its
+contract, its operation notes and its stack facts.
+
+```sh
+sannr stack import ../api-stacks --stack billing
+sannr stack import https://git.example.test/acme/api-stacks.git --stack billing --ref v2
+sannr stack import ../api-stacks --all --dry-run
+sannr stack import ../api-stacks --stack billing --as billing-library
+```
+
+The source is a local path or a Git URL. A path names a repository, its
+`.sannr/stacks` directory or one stack folder, and is read as it is on disk. A
+Git URL uses `https`, `ssh` (including the `user@host:path` spelling) or
+`file`; `--ref` names a branch, a tag or, where the server allows it, a commit,
+and defaults to the remote `HEAD`. Sannr runs your own `git` to fetch one
+commit into a temporary bare repository, prints that command on stderr before
+it runs, and removes the directory afterwards, including when the command is
+interrupted or terminated. Nothing is checked out: the stack folders are read
+from git's object store, so no hook, smudge filter or LFS download runs on the
+source's files. The git child process does not inherit `GIT_DIR`,
+`GIT_WORK_TREE`, `GIT_INDEX_FILE`, `GIT_CONFIG_*` or any other `GIT_*`
+variable except the SSH, askpass, proxy and TLS settings, so an import run
+from a hook or `rebase --exec` cannot touch your own repository. Sannr
+downloads nothing itself. One stack folder, on disk or at the root of a Git
+repository, is named by its `stack.json`.
+
+A source with one stack imports it. With several, the command lists them,
+writes nothing and exits non-zero until you pass `--stack <name>` (repeatable)
+or `--all`. `--as <name>` installs one imported stack under another name.
+`--dry-run` prints the receipt and writes nothing. `--json` prints the receipt
+as JSON: the source and its commit, and for each stack the files written, the
+note counts (`added`, `updated`, `retired`, `unchanged`) and what was not
+imported. Import, dry run and update send no API request.
+
+Every receipt, dry run included, lists each environment of the stack with the
+host its requests go to, the host of its `tokenUrl` if it has one, the names
+of the variables its credentials are read from and its `production` flag
+(`environments[].base_url_host`, `token_url_host`, `auth_variables`,
+`production`). Read it before using the stack: a source chooses those hosts,
+and a familiar variable name does not make the host yours.
+
+The source is untrusted data. Its `stack.json` passes the same checks as a
+local stack: an unknown key refuses by name (`STACK_KEY_UNKNOWN`), and so do a
+secret-shaped literal and a credential header. A contract must sit inside its
+own stack folder (`STACK_CONTRACT_OUTSIDE_PROJECT`). Every contract the stack
+names, for any environment, must end in `.json`, `.yaml` or `.yml` and be a
+contract `stack add --contract` accepts: the same reader, and at least one
+operation. A dotfile, a dot-directory, and a name reserved for agent
+instructions or tool configuration (`AGENTS`, `CLAUDE`, `mcp`, `package` and
+similar) refuse by name with `STACK_CONTRACT_INVALID`; the message tells the
+source's author what to rename. No other file in the source folder is copied.
+A symbolic link anywhere in the stack folder refuses (`STACK_UNSAFE_PATH`).
+Every note passes the note secret check, and so do its author name, source
+reference and applicability; a secret-shaped value refuses with
+`SECRET_IN_NOTE` and exit 2 without printing it. A secret-shaped contract
+title or path refuses with `STACK_SECRET_LITERAL`. A malformed or changed
+note history refuses with exit 3. Any refusal leaves the repository unchanged. Nothing in a source
+file is executed or followed as an instruction.
+
+What arrives: `stack.json` with its environments, base URLs and credential
+references by variable name; the contract files it names; an operation
+inventory taken from that contract; the active authored notes and stack facts.
+What stays behind: `envFile` paths, shared account facts, evidence files and
+private storage, superseded note history, unattributed and machine-generated
+notes, learned response shapes and verification state, and review decisions.
+The receipt names what it left out under `not_imported` and `skipped`. An
+evidence reference is not carried at all: its run ID, the author's provider
+URL, environment name and build stay in the source, and a basis source that is
+a run ID is dropped. The imported note keeps only how many runs the author
+attached (`imported.evidence_count`), and `show` and `context query` read it
+as `unavailable` here. An imported stack is
+`written` until this repository observes or verifies it itself.
+
+Every imported note keeps its author, date, basis and source, and gains an
+`imported` record: the source, the source commit when there is one, the import
+date and the note's identity in the source. `show`, `context query`, request
+`known` blocks and the managed instructions print it, so an imported note is
+never mistaken for one written or observed here. `sannr stacks` marks the
+stack `imported from <source>`. The source is recorded as the Git URL without a
+login name, or as a path relative to this repository; a path more than two
+directories above the repository is recorded by its directory name alone,
+which is a label and not an identity (`imported_from.exact` is `false`). For
+a local path the commit is the source repository's `HEAD`, read from its files;
+uncommitted changes in the source are imported and are not reflected in it.
+
+A name that already exists here and did not come from the same source refuses
+with `STACK_EXISTS` and names `--as`. So does any second import from a local
+source recorded by directory name only, because that name cannot show it is
+the same source. An import that later imports can update needs a Git URL or a
+path within two directories of this repository.
+Importing again from the same source is an update: new upstream notes are added, a note the author superseded replaces
+its imported predecessor, and a note the author retired is retired here; the
+old text stays in `show --history`. Notes written, observed or reviewed in this
+repository are never overwritten or dropped. A locally trusted imported note
+is not overturned without a run: the upstream change arrives beside it (a
+retirement then names the local note's identity) and every import lists the
+trusted note under `held` until it is resolved here. An imported note that is no longer active in
+the source and has no replacement there is left alone and listed under
+`no_longer_upstream`. An update changes neither the local `stack.json` nor the
+local contract; a contract that changed in the source is named in the receipt.
+
+After an import, existing managed blocks in `AGENTS.md` and `CLAUDE.md` are
+refreshed as they are after `note`; the receipt reports that result separately.
+The first knowledge write in a repository also creates `.sannr/README.md`,
+`.sannr/.gitignore` and `.sannr/layout.json`; the receipt lists them under
+`layout_files`. A new stack is installed whole or not at all. Its folder is
+created by the import and must not exist beforehand, even empty; if a write
+fails part-way, only the files and folders the import made are removed. When
+one of several stacks cannot be written the run stops: the receipt lists the
+stacks already in place, which stay, and a named error on stderr gives the
+stack that failed (`failed`, `not_attempted` in JSON); the exit is non-zero. The MCP tool surface has
+no import action.
 
 ## Account facts
 

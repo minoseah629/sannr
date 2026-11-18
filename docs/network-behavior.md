@@ -64,6 +64,21 @@ those steps are authorized. Reading saved context, writing notes, generating a
 static view and importing a local collection do not execute the collection's APIs.
 See the [API call policy](api-call-policy.md) and [agent guide](agent-guide.md).
 
+## Importing a stack
+
+`stack import <source>` sends no request to any API, including with `--dry-run`
+and when it updates a stack imported earlier. It reads the source's files and
+never uses the base URLs or credentials they name. A local path involves no
+network. For a Git URL the only network use is your own `git`: Sannr prints
+`git fetch --depth 1 --no-tags -- <url> <ref>` on stderr, then runs it into a
+temporary bare repository and removes that directory when the command ends
+or is interrupted. Nothing is checked out, so no hook, filter or LFS download
+runs. `git` uses the transport, proxy and credentials you have configured for
+it, but not `GIT_DIR`, `GIT_WORK_TREE`, `GIT_CONFIG_*` or other variables that
+would point it at another repository; Sannr downloads no archive itself. Only `https`, `ssh` and `file` URLs are fetched,
+and a URL carrying a password, query or fragment is refused. See
+[stacks](stacks.md#import-a-stack-from-another-repository).
+
 ## Explicit Postman capture
 
 `postman capture` is an intentional migration feature. It contacts

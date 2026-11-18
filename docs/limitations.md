@@ -51,9 +51,24 @@ see [SUPPORT.md](../SUPPORT.md).
   not recorded. Authored notes still work and are delivered to agents.
 - Monorepos get one install at the root. Stacks separate APIs inside it, but
   nothing scopes a stack to a package folder yet.
-- Cross-repository stack sharing is not supported. The older grant-based
-  context reads across repositories remain an opt-in capability with their
-  own [guide](dependency-graph.md).
+- A stack is shared across repositories by copying it with
+  [`stack import`](stacks.md#import-a-stack-from-another-repository); there is
+  no live link. It brings the contract, the active authored notes and the
+  stack facts. Evidence references (only their count), learned response shapes, verification state, review decisions,
+  superseded history and unattributed notes are not imported. An update never
+  changes the local `stack.json` or contract, so a contract that changed in
+  the source is reported and has to be replaced by hand. A Git source is
+  fetched over `https`, `ssh` or `file` only; `--ref` with a commit ID works
+  only where the server serves that commit. A local source more
+  than two directories above the repository is recorded by directory name
+  alone and can be imported once per name; a later import from it refuses
+  and names `--as` rather than update. Contract files must end in `.json`,
+  `.yaml` or `.yml`. Import provenance on a
+  note imported a second time through an intermediate repository names the
+  intermediate repository only. Clients older than this command read an
+  imported stack but do not mark it. The older grant-based context reads
+  across repositories remain an opt-in capability with their own
+  [guide](dependency-graph.md).
 
 ## Protocols
 

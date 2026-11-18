@@ -30,6 +30,7 @@ import { contextFileFor, currentStackScope, withStackScope } from "../lib/stack-
 import { projectPathProblem as setupPathProblem } from "../lib/connect.mjs";
 import { stackCatalog, resolveStack, stackScope, createStack, planStack, stackNameFromTitle, isBuiltinStack, isBuiltinFeedbackTarget, assertWritableStack } from "../lib/stacks.mjs";
 import { detectFirstStack, stackNameFromHost } from "../lib/first-stack.mjs";
+import { importRecord, parseImportSource, openImportSource, planImport, applyImport, importReceipt } from "../lib/stack-import.mjs";
 import { resolveConfig, authReadiness, credentialEnvironment, FALLBACK_BASE_URL, BUILTIN_DEFAULTS } from "../lib/config.mjs";
 import { parseAuthReference } from "../lib/auth-reference.mjs";
 import {
@@ -562,7 +563,7 @@ function firstStack(root, { name, contract, baseUrl: explicitBaseUrl, auth: expl
   return createStack(root, name, { title, contract, ...(baseUrl ? { baseUrl, auth: cfg.auth, environment: cfg.name ?? "default", production: cfg.production } : {}) });
 }
 function cmdStack(argv) {
-  if (argv[1] !== 'add') die('STACK_ARGUMENT_INVALID', `Use ${CLI_NAME} stack add <name> --base-url <url>.`);
+  if (argv[1] !== 'add') die('STACK_ARGUMENT_INVALID', `Use ${CLI_NAME} stack add <name> --base-url <url>, ${CLI_NAME} stack import <source> or ${CLI_NAME} stack move --to <stack> "<METHOD /path>".`);
   const name = argv[2];
   const allowed = ['--base-url', '--auth', '--contract', '--env', '--title'];
   for (let i = 3; i < argv.length; i++) {
@@ -595,7 +596,9 @@ function cmdStacks(argv) {
     const ctx = loadContext(root), records = Object.values(ctx?.api_context?.operations ?? {});
     const cfg = resolveConfig(root);
     const confidence = stackEvidenceClasses(root, ctx ?? {}, { config: cfg, commits: false });
+    const origin = importRecord(ctx);
     return { name: row.name, environments: Object.keys(row.document.environments),
+      ...(origin ? { imported: { source: origin.source, ...(origin.commit ? { commit: origin.commit } : {}), at: origin.imported_at } } : {}),
       contract: { state: cfg.contract ? (existsSync(cfg.contract) ? 'bound' : 'missing') : 'not_bound',
         ...(cfg.contract ? { path: relative(root, cfg.contract) } : {}) },
       counts: { operations: confidence.operations.size, evidence_classes: confidence.counts,
@@ -605,7 +608,7 @@ function cmdStacks(argv) {
   const report = { stacks, ...(catalog.defaults?.default_stack ? { default_stack: catalog.defaults.default_stack } : {}),
     ...(catalog.problems.length ? { problems: catalog.problems } : {}) };
   console.log(argv.includes('--json') ? JSON.stringify(report, null, 2) : [
-    ...stacks.map(row => `${row.name}: ${row.environments.join(', ') || 'no environments'}; contract ${row.contract.state}; `
+    ...stacks.map(row => `${row.name}: ${row.imported ? `imported from ${row.imported.source}${row.imported.commit ? ` at commit ${row.imported.commit.slice(0, 12)}` : ''} on ${row.imported.at}; ` : ''}${row.environments.join(', ') || 'no environments'}; contract ${row.contract.state}; `
       + (row.counts ? `${row.counts.operations} operations; ${formatEvidenceClassCounts(row.counts.evidence_classes)}; ${row.counts.observations} observations, ${row.counts.notes} notes` : 'counts unavailable')),
     ...catalog.problems.map(problem => `${problem.code}: ${problem.message}`),
   ].join('\n') || 'No explicit stacks; existing installations use their legacy configuration.');
@@ -968,6 +971,87 @@ async function cmdMigrate(argv) {
     : `${dryRun ? 'Would migrate' : 'Migrated'} ${plan.moved.length + stacksPlan.moves.length} files into ${LAYOUT.directory}; ${writes.length} managed references updated.\n`
       + [...stacksPlan.suggestions, ...stacksPlan.issues].map(row => `${row.code}: ${row.argument ?? row.operation ?? row.run ?? row.record ?? row.stack}`).join('\n')
       + `\n${report.next}`);
+}
+
+// Import a stack from another repository. Planning validates the whole source
+// and writes nothing; --dry-run stops there. The only network use is the
+// user's own git for a Git source, named on stderr before it runs.
+async function cmdStackImport(argv) {
+  const usage = `${CLI_NAME} stack import <source> [--stack <name>]... [--all] [--as <name>] [--ref <git-ref>] [--dry-run] [--json]`;
+  const asJson = argv.includes('--json'), stacks = [];
+  let source, as, ref, all = false, dryRun = false;
+  for (let i = 2; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--json') continue;
+    if (arg === '--all') { all = true; continue; }
+    if (arg === '--dry-run') { dryRun = true; continue; }
+    const match = /^(--stack|--as|--ref)(?:=(.*))?$/.exec(arg);
+    if (match) {
+      const value = match[2] ?? argv[++i];
+      if (!value || value.startsWith('--') || match[1] === '--as' && as !== undefined || match[1] === '--ref' && ref !== undefined)
+        die('STACK_ARGUMENT_INVALID', `${match[1]} needs one value${match[1] === '--stack' ? '' : ' and may appear once'}.`, usage);
+      if (match[1] === '--stack') stacks.push(value); else if (match[1] === '--as') as = value; else ref = value;
+    } else if (!arg.startsWith('-') && source === undefined) source = arg;
+    else die('STACK_ARGUMENT_INVALID', 'Unknown stack import option; its value is not displayed.', usage);
+  }
+  if (!source) die('STACK_ARGUMENT_INVALID', 'Name the source: a local path or a Git URL.', usage);
+  const root = repoRoot();
+  let opened, receipt;
+  try {
+    opened = await openImportSource(root, parseImportSource(source, { ref }),
+      { announce: line => console.error(`Network: running ${line} (your own git; no API request is sent)`) });
+    const plan = planImport(root, opened, { stacks, all, as });
+    receipt = importReceipt(plan, { dryRun });
+    if (dryRun) receipt.pointers = { state: 'not-run', files: [] };
+    else {
+      const applied = applyImport(plan);
+      // A stack that could not be written stops the run. The receipt then
+      // covers only the stacks that are in place, and names the one that failed.
+      if (applied.failed) receipt = { ...importReceipt(plan, { written: applied.written }), ...(applied.written.length ? {} : { layout_files: [] }),
+        failed: applied.failed, not_attempted: applied.not_attempted };
+      receipt.pointers = applied.scope ? withStackScope(applied.scope, () => refreshNotePointers(root, 'Repeat the same import command; an unchanged import only retries the refresh.'))
+        : { state: 'not-run', files: [] };
+    }
+    opened.release();
+  } catch (error) {
+    opened?.release();
+    const code = error.code ?? 'STACK_IMPORT_FAILED';
+    // The note contract's exit codes: 2 for a secret, 3 for a note policy.
+    if (code === 'SECRET_IN_NOTE' || /^(?:NOTE_|MARKUP_IN_NOTE$)/.test(code)) {
+      (asJson ? console.log : console.error)(JSON.stringify({ refused: code, reason: error.message,
+        ...(typeof error.operation === 'string' ? { target: error.operation } : {}),
+        next: 'Nothing was written. Correct the source stack, or import a different one.' }, null, 1));
+      process.exit(code === 'SECRET_IN_NOTE' ? 2 : 3);
+    }
+    die(code, error.message, error.next);
+  }
+  if (asJson) console.log(JSON.stringify(receipt, null, 2));
+  else {
+    const where = `${receipt.source.location}${receipt.source.ref ? ` (${receipt.source.ref})` : ''}${receipt.source.commit ? ` at commit ${receipt.source.commit.slice(0, 12)}` : ', no commit recorded'}`;
+    const lines = [];
+    for (const row of receipt.stacks) {
+      const verb = dryRun ? (row.action === 'update' ? 'Would update' : 'Would import') : row.action === 'update' ? 'Updated' : 'Imported';
+      lines.push(`${verb} ${row.stack}${row.from !== row.stack ? ` (${row.from} in the source)` : ''} from ${where}: ${row.operations} operations; notes ${row.notes.added} added, ${row.notes.updated} updated, ${row.notes.retired} retired, ${row.notes.unchanged} unchanged.`);
+      for (const env of row.environments) lines.push(`  Environment ${env.name}${env.default ? ' (default)' : ''}: requests go to ${env.base_url_host}`
+        + `${env.token_url_host ? `; token requests go to ${env.token_url_host}` : ''}; credentials read from ${env.auth_variables.join(', ') || 'no variable'}; production: ${env.production ? 'yes' : 'no'}`);
+      if (row.files.length) lines.push(`  ${dryRun ? 'Would write' : 'Wrote'}: ${row.files.join(', ')}`);
+      if (row.not_imported.length) lines.push(`  Not imported: ${row.not_imported.join('; ')}`);
+      if (row.evidence_unavailable) lines.push(`  Evidence references left in the source (only their count is kept): ${row.evidence_unavailable}`);
+      if (row.skipped.length) lines.push(`  Skipped notes: ${row.skipped.length} (${[...new Set(row.skipped.map(item => item.reason))].join(', ')})`);
+      if (row.held.length) lines.push(`  Locally trusted notes kept beside the upstream change: ${row.held.length}`);
+      if (row.no_longer_upstream.length) lines.push(`  Imported notes no longer active in the source, left as they are: ${row.no_longer_upstream.length}`);
+    }
+    if (receipt.layout_files.length) lines.push(`${dryRun ? 'Would also write' : 'Also wrote'} the managed directory's own files: ${receipt.layout_files.join(', ')}`);
+    if (receipt.failed) lines.push(`Not written: ${[receipt.failed.stack, ...receipt.not_attempted].join(', ')}.`);
+    lines.push(dryRun ? 'Dry run: nothing was written. No API request was sent.' : `No API request was sent. Managed instructions: ${receipt.pointers.state}.`);
+    console.log(lines.join('\n'));
+  }
+  if (receipt.failed) {
+    console.error(JSON.stringify({ error: { code: receipt.failed.code, stack: receipt.failed.stack, message: `Stack '${receipt.failed.stack}' was not written: ${receipt.failed.message}`,
+      next: `${receipt.stacks.length ? `Already written and kept: ${receipt.stacks.map(row => row.stack).join(', ')}. ` : ''}Resolve the error and run the same import again; stacks already written are updated, not duplicated.` } }, null, 1));
+    process.exitCode = receipt.failed.code === 'SECRET_IN_NOTE' ? 2 : /^NOTE_/.test(receipt.failed.code) ? 3 : 1;
+  }
+  if (receipt.pointers.state === 'failed') process.exitCode = 1;
 }
 
 async function cmdStackMove(argv) {
@@ -5586,7 +5670,7 @@ const HELP = {
              example: `${CLI_NAME} grant ../billing-api` },
   revoke:  { blurb: "withdraw a grant; dead on the very next query, no daemon to lag behind",
              example: `${CLI_NAME} revoke billing-api` },
-  stack: { blurb: 'add an API stack or move an operation into its chosen stack', example: `${CLI_NAME} stack add billing --base-url https://billing.example.test --auth bearer:BILLING_KEY` },
+  stack: { blurb: 'add an API stack, import one from another repository, or move an operation into its chosen stack', example: `${CLI_NAME} stack add billing --base-url https://billing.example.test --auth bearer:BILLING_KEY` },
   stacks: { blurb: 'list stack environments, contract state and knowledge counts', example: `${CLI_NAME} stacks --json` },
   init:    { blurb: `inventory the contract into ${contextFile()} (no execution)`,
              example: `${CLI_NAME} init` },
@@ -5709,6 +5793,7 @@ function printCommandHelp(name) {
   if (name === 'note') detail += `\n\nBasis on new provenance:\n  --basis KIND [--source REF]\nKinds: ${NOTE_BASIS_KINDS.join(', ')}. Source is a run ID, repository-relative contract/source file and optional digest, or documentation URL without query values. Sources are data and are never fetched. Existing provenance is immutable; duplicate retries report the original basis. Legacy opening-word inference appears only on reads, explicitly marked inferred. --actor imported attributes import/summary tools separately from people and agents.\n` ;
   if (name === 'note') detail += `\n\nRetirement:\n  ${CLI_NAME} note "METHOD /path" "REASON TEXT" --retires sha256:<full-note-digest> --reason false|removed|replaced-by-version|no-longer-applies|other [--actor person|agent] [--by NAME] [--evidence run-ID] [--stack NAME] --json\nAppends a retirement note naming the original identity and a replacement link with a separate reason-class record. Original text and provenance remain in history. Trusted guidance requires an attached run, including ordinary supersession. Actor defaults to agent; by uses the local note author marker. Both are attribution, not authentication. Operation notes also accept --by and --actor when first authored. Never select notes by array position. Docs: docs/note-history.md.`;
   if (name === "context") detail += `\n\nA query JSON may contain search (case-insensitive text) and operation to filter selected stack facts. Retrieval stays local and returns an omission count plus show command.`;
+  if (name === "stack") detail += `\n\nImport a stack from another repository:\n  ${CLI_NAME} stack import <source> [--stack <name>]... [--all] [--as <name>] [--ref <git-ref>] [--dry-run] [--json]\n\n  <source>         a local path (a repository, its stacks directory or one stack folder) or a Git URL (https or ssh)\n  --stack <name>   choose a stack when the source holds several; repeatable\n  --all            import every stack in the source\n  --as <name>      install one imported stack under another name\n  --ref <git-ref>  branch, tag or commit of a Git source (default: its HEAD)\n  --dry-run        print the receipt and write nothing\n  --json           the receipt as JSON\n\nThe source is validated as untrusted data and nothing in it is executed. Its contract and notes arrive marked with the source, its commit and the import date; envFile paths, account facts, evidence files and references, learned shapes and review decisions stay behind. Importing again from the same source is an update that never overwrites local notes. A name that exists and came from elsewhere refuses and names --as. The receipt lists each environment's request host, token host, credential variable names and production flag. No API request is sent; a Git source is fetched with your own git, named before it runs, into a temporary bare repository that is never checked out. A secret-shaped note exits 2, a note-history refusal exits 3.`;
   if (name === "stack") detail += `\n\nRe-file an operation without deleting its note history:\n  ${CLI_NAME} stack move --to <stack> "<METHOD /path>" [--from <stack>] [--json]`;
   if (name === 'feedback') detail += `\n\nOptional send:\n  --send                  prepare a scanned, anonymized payload and private receipt, then apply feedback.send\n  --confirm-send          attest the human said yes to this report in the current session\n  --agent-note <text>      optional plain-text feedback, at most 4,000 characters\n  --answers <json-file>    cry_wolf, new_to_you and first_ten_minutes answers\n  --score <1-10>          optional integer score\n  --host-agent <name>      claude-code, codex or other\n  --json                  return the safe client result for a send, or the local report without --send\n\nAsk is the default; explicit allow discloses before sending. The never setting refuses every send. Repository API environment selection applies to collection only, never the feedback destination. See docs/feedback.md.`;
   if (name === 'survey') detail += `\n\nUsage:\n  ${CLI_NAME} survey generate [--exclude-env] [--include-fixtures] [--out <json>]\n  ${CLI_NAME} survey status [--file <json>]\n  ${CLI_NAME} survey query --operation "<METHOD /path>" [--stack <name>] [--max-bytes 8192]\n  ${CLI_NAME} survey render --format json|dot|html [--file <json>] [--out <file>]\n\n--state-dir selects private change-detection state. Writes outside the project require --allow-outside-project. Query/render never scan or regenerate; status checks explicitly without rewriting the snapshot. No requests, application starts or credential resolution. Missing snapshots name generate; invalid snapshots produce a diagnostic. See docs/survey.md for provenance, scope and limitations.`;
@@ -5755,6 +5840,7 @@ if (command === 'saved') {
 if (!command && !existsSync(join(repoRoot(), contextFile()))) printCommandHelp("start");
 else if (command === "stack") {
   if (argv[1] === "move") await cmdStackMove(argv);
+  else if (argv[1] === "import") await cmdStackImport(argv);
   else cmdStack(argv);
 }
 else if (command === "stacks") cmdStacks(argv);

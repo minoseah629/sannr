@@ -205,6 +205,14 @@ explicit repair, not silent normalization. See `docs/note-history.md` in the
 installed package. Scoped `api_context` observations are a separate ledger;
 these relationship flags apply to legacy operation notes.
 
+To reuse a stack another repository already keeps, run
+`sannr stack import <path-or-git-url> [--stack <name>] [--dry-run]` instead of
+copying its folder. The import validates the source, leaves `envFile` paths,
+account facts and evidence behind, and marks every note with where it came
+from; it sends no API request. Imported notes are another repository's claims,
+not observations made here: read their `imported` source and date, and record
+what this repository observes as its own note alongside.
+
 Structure, so every write reads the same three years on:
 
 - The operation is `METHOD /path` exactly as the contract spells it

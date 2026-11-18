@@ -471,6 +471,22 @@ and unknown categories. `note --actor imported` records an import/summary
 tool explicitly; legacy import/summary author names are inferred as imported.
 Review deciders remain people or agents.
 
+A note installed by [`stack import`](stacks.md#import-a-stack-from-another-repository)
+keeps the author's `by`, `at`, `basis` and `source` and adds an `imported`
+object to its provenance: `source`, optional `commit`, `at` (the import day),
+`note` (the note's identity in the source) and, when the author had attached
+runs, `evidence_count`. The author's evidence references themselves are not
+imported. It is covered by the note identity
+like the rest of the provenance. Read models add `imported` beside `basis` and
+`author`; the human view and managed blocks append `imported from "<source>" at
+commit <id> on <date>`. The knowledge file's root gains `imported_from` with the
+source, source stack, optional ref and commit, and the first and latest import
+dates. Both fields are additive. A client older than this field reads the file
+with a healthy history and can write to it, keeping both fields, but shows an
+imported note as an ordinary authored note with the author's name and date and
+does not mark the stack as imported; upgrade collaborators before relying on
+the mark.
+
 Shared lanes identify covered kept runs, out-of-scope runs, earlier runs with
 nothing kept, documentation, code/local tests and client/tooling notes. Unknown
 basis has an honest unclassified lane. A kept run is rechecked locally; missing

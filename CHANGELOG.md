@@ -10,6 +10,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) headings,
 
 ## [Unreleased]
 
+- `stack import <source>` installs one or more stacks from another repository:
+  a local path (a repository, its stacks directory or one stack folder) or a
+  Git URL fetched with your own `git`, named on stderr before it runs.
+  `--stack` (repeatable) or `--all` chooses among several, `--as` renames one,
+  `--ref` picks a Git ref, `--dry-run` writes nothing and `--json` prints the
+  receipt. The source is validated as untrusted data; its contract, active
+  authored notes and stack facts arrive, and `envFile` paths, account facts,
+  evidence files and references (only their count), learned shapes and review
+  decisions do not. Imported notes
+  keep the author's basis, date and source and carry an additive `imported`
+  provenance record (source, commit, import date) that `show`,
+  `context query`, request `known` blocks, managed instructions and `stacks`
+  print. Importing again from the same source is an update that adds, replaces
+  and retires upstream notes without touching local ones; an existing name
+  from elsewhere refuses and names `--as`. No API request is sent. Older
+  clients read an imported stack without the mark. A Git source is fetched
+  into a bare temporary repository and never checked out, with `GIT_DIR` and
+  the other redirecting `GIT_*` variables removed from git's environment; the
+  receipt lists each environment's hosts, credential variable names and
+  production flag; every named contract must be one `stack add --contract`
+  accepts, with an allowed file name. See `docs/stacks.md`.
+
 ## [0.1.0-beta.2] - 2026-11-06
 
 - Native Windows is supported from this version: Windows paths and `node.exe`
