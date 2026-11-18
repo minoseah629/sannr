@@ -13,6 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { BUILTIN_DEFAULTS } from '../lib/config.mjs';
+import { readRateLimit } from '../lib/response-headers.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CLIENT = pathToFileURL(join(ROOT, 'lib/client.mjs')).href;
@@ -445,4 +446,14 @@ test('budgeted assertion failures retain counts and name omitted details', async
   assert.equal(result.assertions.passed, 0);
   assert.equal(result.assertions.failures.length + result.assertions.omitted_failures, 50);
   assert.ok(Buffer.byteLength(JSON.stringify(result)) <= 3200 || result.budget_min);
+});
+
+test('an empty rate-limit header reads as absent, never as zero', () => {
+  // beta.1's HTTP client returned null for an empty value; the shared reader
+  // the protocol adapters now use must not turn it into a false exhaustion.
+  assert.deepEqual(readRateLimit({ 'x-ratelimit-limit': '100', 'x-ratelimit-remaining': '' }),
+    { limit: 100, remaining: null, reset: null });
+  assert.deepEqual(readRateLimit({ 'RateLimit-Limit': '', 'RateLimit-Remaining': '', 'RateLimit-Reset': '' }), null);
+  assert.deepEqual(readRateLimit(new Headers({ 'x-ratelimit-limit': '0', 'x-ratelimit-remaining': '0' })),
+    { limit: 0, remaining: 0, reset: null });
 });

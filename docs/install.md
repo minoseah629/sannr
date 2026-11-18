@@ -65,7 +65,7 @@ and 24 for every change. The full product suite on Windows is a manual CI
 dispatch rather than a per-change gate, and it still reports failures; the
 product behaviors known not to work on Windows yet are listed under
 [limitations](limitations.md#platforms-and-hosts). Browser behavior, the
-Claude Code hook firing inside Claude Code and the Workbench opener are not
+Claude Code hook firing inside Claude Code and the Workbench and `view --open` openers are not
 exercised by CI.
 Restart the coding host after setup and compare the new repository binding
 before claiming activation.

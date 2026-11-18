@@ -10,25 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) headings,
 
 ## [Unreleased]
 
-- `view --open` on Windows hands the written page to PowerShell's `Start-Process`,
-  the opener the Workbench already used (now shared in `lib/os-open.mjs`), instead
-  of explorer.exe, which exits 1 after a successful open and so made every
-  `--open` report `VIEW_OPEN_FAILED` with exit 1 although the page had opened.
-  macOS and Linux output is unchanged.
-- The opener's Windows default and the Windows test fixtures compose their
-  drive and UNC paths instead of spelling them, so the release gate's
-  tracked-file hygiene check (no machine absolute paths) passes again; it
-  failed on the 0.1.0-beta.2 tag.
-- The optional gRPC adapter now pins `@grpc/grpc-js` 1.14.7 (upstream: a retry
-  timer is cleared when a call is cancelled, and a write error after an HTTP/2
-  reset reports the reset code in its status), with the hash catalog
-  regenerated so the adapter still loads.
-- The optional WebSocket adapter, used for GraphQL subscriptions, now pins `ws`
-  8.22.1 (upstream: IPC URL paths are no longer cut at a colon, frames never
-  carry empty chunks, and Node's own masking is used where available), with
-  the hash catalog regenerated so the adapter still loads.
-
-## [0.1.0-beta.2] - 2026-11-05
+## [0.1.0-beta.2] - 2026-11-06
 
 - Native Windows is supported from this version: Windows paths and `node.exe`
   are used directly for MCP registration, a package-manager MCP launch runs
@@ -39,7 +21,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) headings,
   run the core safety set and the native CLI, MCP and Workbench scenarios on
   Node 22 and 24; the full product suite on Windows is an opt-in CI dispatch.
   Windows file privacy relies on NTFS ACLs, which Node's POSIX mode bits do not
-  describe.
+  describe. Not yet qualified there: `migrate` refuses an existing evidence
+  directory, relative paths from source scanning and some `connect` and `map`
+  output use backslashes, and a migrated pre-layout registration can write an
+  unescaped backslash into JSON. See
+  [limitations](docs/limitations.md#platforms-and-hosts).
 - `connect --claude-hook` writes the Claude Code hook in exec form on Windows
   (`command` is Node, `args` the generated words) so it runs without a shell;
   the shell-form string PowerShell could not run is rewritten in place. macOS
@@ -49,11 +35,39 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) headings,
 - `workbench` opens the browser on Windows through PowerShell's `Start-Process`,
   reading the URL from an environment variable; it used to spawn `xdg-open`
   there and only print the fallback message.
+- `view --open` on Windows hands the written page to the same opener
+  `workbench` now uses (shared in `lib/os-open.mjs`) instead of explorer.exe,
+  which exits 1 after a successful open and so made every `--open` report
+  `VIEW_OPEN_FAILED` with exit 1 although the page had opened. macOS and
+  Linux output is unchanged.
 - The committed pointer block names `node ./node_modules/@sannr/sannr/bin/cli.mjs`
   as the PowerShell form of the CLI, and `connect` on Windows prints the same
   hint, because the `.bin` shim's `.ps1` sibling is blocked by the default
   Windows client execution policy. The install, limitations and quickstart
   docs explain the launchers and which host shell each applies to.
+- GraphQL and JSON-RPC envelopes show the same bounded header selection as an
+  HTTP request instead of every response header, so a large header set no longer
+  spends the response budget before the data. `rate_limit`, always `null` on
+  these envelopes before, reads `RateLimit-*` or `X-RateLimit-*` headers as
+  `{limit, remaining, reset}`, with `throttled_by_server` and `retry_after_ms`
+  on a 429. Header assertions still see every header, and the full set stays in
+  private evidence.
+- A GraphQL or JSON-RPC request refused before dispatch says what was refused:
+  `error.message` is the adapter's reason instead of one generic sentence, and
+  `GRAPHQL_VALIDATION_FAILED` adds `error.details`, up to five validation
+  messages with their document position. A variable problem names the variable
+  and its declared type, never the supplied value.
+- The Workbench opens a note on a GraphQL operation (`query Name`,
+  `mutation Name` or `subscription Name`) with its trace and Verify prompt;
+  opening one used to answer `WORKBENCH_NOTE_INVALID`.
+- The optional gRPC adapter now pins `@grpc/grpc-js` 1.14.7 (upstream: a retry
+  timer is cleared when a call is cancelled, and a write error after an HTTP/2
+  reset reports the reset code in its status), with the hash catalog
+  regenerated so the adapter still loads.
+- The optional WebSocket adapter, used for GraphQL subscriptions, now pins `ws`
+  8.22.1 (upstream: IPC URL paths are no longer cut at a colon, frames never
+  carry empty chunks, and Node's own masking is used where available), with
+  the hash catalog regenerated so the adapter still loads.
 
 ## [0.1.0-beta.1] - 2026-11-03
 
