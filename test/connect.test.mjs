@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { stableNodeCommand } from "../lib/node-runtime.mjs";
 // CONNECT — the adoption mechanic: the path from "a stranger heard about this"

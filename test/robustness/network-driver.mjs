@@ -10,7 +10,7 @@ const repo = fileURLToPath(new URL('../../', import.meta.url));
 export function jobs(iterations = 1) {
   return ['inspectMcp:stdio', 'inspectMcp:http', 'apiRequest'].flatMap(entry => (entry.endsWith('stdio') ? MCP_CLASSES : entry.endsWith('http') ? MCP_HTTP_CLASSES : HTTP_CLASSES).flatMap(variation => Array.from({ length: iterations }, (_, index) => ({ entry, variation, index }))));
 }
-export const cleanEnv = (root, url, variation) => ({ ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:API_|SANNR_|FLEET_|POSTMAN_|NODE_OPTIONS)/.test(key))), HOME: root, USERPROFILE: root, API_CONTEXT_DIR: root, API_CONTEXT_OFF: '1', API_FRICTION_OFF: '1', API_USAGE_LOG: join(root, 'usage.jsonl'), API_EVIDENCE: join(root, 'evidence'), API_BASE_URL: url ?? 'http://127.0.0.1:1', API_TIMEOUT_MS: String(timeoutFor(variation)), API_BUDGET: '800' });
+export const cleanEnv = (root, url, variation) => ({ ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:API_|SANNR_|FLEET_|POSTMAN_|NODE_OPTIONS)/.test(key))), DO_NOT_TRACK: '1', HOME: root, USERPROFILE: root, API_CONTEXT_DIR: root, API_CONTEXT_OFF: '1', API_FRICTION_OFF: '1', API_USAGE_LOG: join(root, 'usage.jsonl'), API_EVIDENCE: join(root, 'evidence'), API_BASE_URL: url ?? 'http://127.0.0.1:1', API_TIMEOUT_MS: String(timeoutFor(variation)), API_BUDGET: '800' });
 async function child(args, root, env, deadline = 4000) {
   return new Promise(resolve => {
     const proc = spawn(process.execPath, args, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });

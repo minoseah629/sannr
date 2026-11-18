@@ -1,5 +1,6 @@
 // Independent end-to-end auth requirements and inherited setup provenance.
 // Controlled loopback fixtures only; every credential below is synthetic.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';

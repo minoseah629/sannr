@@ -9,6 +9,7 @@
 // route auditor that cries wolf gets ignored, and an ignored auditor never
 // surfaces the admin backdoor it exists to find.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { auditSurface, canonPath, extractRoutes } from "../lib/audit.mjs";

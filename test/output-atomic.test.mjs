@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { unsafeAliasSync } from './helpers/unsafe-alias.mjs';
 // MAP-1C fix round 1 (B3): evidence run files are written atomically. The
 // bytes go to an exclusively created temporary file in the same directory and

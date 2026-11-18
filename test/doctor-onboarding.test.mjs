@@ -1,6 +1,7 @@
 // The public onboarding target is intercepted at fetch; this suite never calls
 // GitHub. The original method/URL/announcement and real client evidence remain
 // asserted, while response bytes come only from controlled loopback fixtures.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile, execFileSync } from 'node:child_process';

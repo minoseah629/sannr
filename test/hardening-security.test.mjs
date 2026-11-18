@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { unsafeAliasSync } from './helpers/unsafe-alias.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import assert from 'node:assert/strict';

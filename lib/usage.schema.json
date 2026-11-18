@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sannr.dev/api/v1/usage/schema",
+  "title": "Sannr anonymous usage counts, version 1",
+  "description": "The whole body POST https://sannr.dev/api/v1/usage accepts, at most 2048 bytes. Sannr sends it at most once a day from an install that has not turned it off. A body with any other property, or any value outside these rules, is refused and nothing is stored.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["v", "install", "version", "os", "arch", "node", "since", "features", "api_calls"],
+  "properties": {
+    "v": { "const": 1, "description": "The version of this document." },
+    "install": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", "description": "A random identifier made on this machine the first time a document is sent. It is derived from nothing: not the machine, the user, a repository or a credential. sannr telemetry reset replaces it; sannr telemetry off deletes it." },
+    "version": { "type": "string", "minLength": 1, "maxLength": 32, "pattern": "^[0-9A-Za-z.+-]+$", "description": "The Sannr version." },
+    "os": { "enum": ["darwin", "linux", "win32", "other"], "description": "The operating system family." },
+    "arch": { "enum": ["arm64", "x64", "other"], "description": "The processor family." },
+    "node": { "type": "integer", "minimum": 18, "maximum": 99, "description": "The major version of Node.js." },
+    "since": { "anyOf": [{ "type": "null" }, { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }], "description": "The UTC date of the previous document from this install, whose counts end where these begin; null in the first document." },
+    "features": { "type": "object", "maxProperties": 64, "propertyNames": { "pattern": "^[a-z][a-z0-9_]{0,31}$" }, "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 10000 }, "description": "How many times each Sannr command or tool ran since the previous document. The names are fixed in Sannr's code; none is taken from anything a person typed." },
+    "api_calls": { "type": "integer", "minimum": 0, "maximum": 1000000, "description": "How many API requests Sannr sent for this install since the previous document. A number only: nothing about any request." }
+  }
+}

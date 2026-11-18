@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { createFixtureStack, fixtureContextFile } from "./helpers/stack-fixture.mjs";
 // DRY-RUN PROMOTION — `sannr learn --dry-run` executes the safe reads but

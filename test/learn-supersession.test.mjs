@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { createFixtureStack, fixtureContextFile, inFixtureStack } from "./helpers/stack-fixture.mjs";
 import { after, before, test } from "node:test";

@@ -8,6 +8,7 @@
 // fired. Fixed by seeding the seen-set with the original page URL. This test
 // fails against the empty-set version.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

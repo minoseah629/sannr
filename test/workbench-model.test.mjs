@@ -1,6 +1,7 @@
 // The Workbench read models as the page receives them: the real engine
 // handlers over the synthetic lab (no network, no real home directory). One
 // test per behavior the DESIGN-1 round-1 fix contract asks of the server.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, chmodSync } from 'node:fs';

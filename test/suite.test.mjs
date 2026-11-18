@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Saved suites: share the normal lifecycle; keep named adversarial boundaries.
 

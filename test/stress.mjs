@@ -11,6 +11,7 @@
 //
 // Every response is checked against invariants. A violation is a bug.
 
+import './helpers/isolated-home.mjs';
 import { spawn } from "node:child_process";
 import { start } from "./fixture-server.mjs";
 import { fileURLToPath } from "node:url";
@@ -190,7 +191,8 @@ export function runHost(base, requests, { deadline } = {}) {
   return new Promise((resolve) => {
     const child = spawn("node", ["server.mjs"], {
       cwd: ROOT,
-      env: { ...process.env, API_BASE_URL: base, API_USAGE_LOG: "/dev/null",
+      // DO_NOT_TRACK: no harness run may count usage or touch machine telemetry state.
+      env: { ...process.env, DO_NOT_TRACK: "1", API_BASE_URL: base, API_USAGE_LOG: "/dev/null",
              API_CONTEXT_OFF: "1", API_EVIDENCE: ("/" + "tmp/stress-evidence"),
              API_CONCURRENCY: "2", API_CONTRACT: "", API_AUTH: "" },
       stdio: ["pipe", "pipe", "pipe"],

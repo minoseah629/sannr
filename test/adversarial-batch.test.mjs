@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Defects found by an independent adversarial suite (2026-08-14) that attacked
 // the input space our own tests never entered. Each test here was confirmed to

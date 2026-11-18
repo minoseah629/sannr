@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { createFixtureStack, fixtureContextFile } from './helpers/stack-fixture.mjs';
 // Per-request freshness: the client answers from the knowledge file and the
 // contract AS THEY ARE NOW, not as they were when its process started.

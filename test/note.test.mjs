@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { createFixtureStack, fixtureContextFile } from "./helpers/stack-fixture.mjs";
 // `sannr note` writes into a committed file, so both of its arguments are
 // a path for a secret to reach git.

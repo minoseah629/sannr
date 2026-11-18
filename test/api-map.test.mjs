@@ -5,6 +5,7 @@
 // value from private evidence or the environment may reach any surface.
 //
 //   node --test test/api-map.test.mjs
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs, { cpSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, unlinkSync, existsSync } from "node:fs";

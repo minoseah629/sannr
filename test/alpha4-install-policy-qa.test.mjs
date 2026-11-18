@@ -1,5 +1,6 @@
 // Independent install-policy checks. All API execution is disabled; files on
 // disk, rather than the implementation's plan, are the write-report oracle.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -20,7 +21,7 @@ function fixture(t, files = {}) {
   t.after(() => rmSync(base, { recursive: true, force: true }));
   const root = join(base, 'repo'), home = join(base, 'home');
   mkdirSync(root); mkdirSync(home);
-  const env = { PATH: process.env.PATH, HOME: home, [HOME_ENV_NAME]: join(home, 'sannr-state'),
+  const env = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: home, [HOME_ENV_NAME]: join(home, 'sannr-state'),
     API_USAGE_LOG: '', NO_COLOR: '1', GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' };
   const write = (path, bytes) => {
     mkdirSync(dirname(join(root, path)), { recursive: true });

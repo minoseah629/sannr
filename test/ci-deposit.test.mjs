@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { createFixtureStack, fixtureContextFile } from "./helpers/stack-fixture.mjs";
 // WIRED-IN ACCUMULATION (PRD Track C) — capture that does not rely on agent

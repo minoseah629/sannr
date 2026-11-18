@@ -15,6 +15,7 @@
 // the selected target is quarantined BY NAME, never approximated against a
 // different target.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";

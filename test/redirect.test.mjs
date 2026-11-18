@@ -8,6 +8,7 @@
 // it forwarded the configured credential to whatever host a server named in
 // Location, which means any upstream could harvest the token by answering 302.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { request } from 'node:http';
@@ -350,4 +351,56 @@ test('concurrency is bounded; shutdown notifies accepted work without retaining 
   assert.equal(signal.aborted, true);
   release();
   await Promise.all(active);
+});
+
+// The launch path (`workbench open`): a one-use grant from the service, in
+// place of a code typed at a terminal.
+function redeem(service, grant, headers = {}) {
+  return call(service, '/launch/redeem', {}, { headers: { 'x-workbench-launch': grant, ...headers } });
+}
+
+test('a launch grant connects one page once; pages coexist; a replayed grant ends its own session and no other', async t => {
+  const states = [];
+  const service = await launch(t, { launch: true, onPairingState: state => states.push(state) });
+  for (const path of ['/pair/start', '/pair/complete']) assert.equal((await call(service, path, {})).status, 404, 'a launched service has no pairing route');
+  assert.equal(service.authorizePairing('ABCD-EFGH-IJKL'), false);
+  const first = service.issueLaunchGrant(), second = service.issueLaunchGrant();
+  assert.match(first.grant, /^[A-Za-z0-9_-]{43}$/); assert.notEqual(first.id, first.grant);
+  assert.equal(service.launchGrantState(first.id), 'pending');
+  for (const token of [undefined, first.grant, first.id, service.url]) assert.equal((await call(service, '/action', undefined, { token })).status, 401);
+  // Another origin cannot spend the grant, and its attempt leaves the grant usable.
+  assert.equal((await redeem(service, first.grant, { origin: 'https://other.example.test' })).status, 403);
+  assert.equal((await redeem(service, first.grant, { 'sec-fetch-site': 'cross-site' })).status, 403);
+  assert.equal((await redeem(service, 'x'.repeat(43))).json.error.code, 'WORKBENCH_LAUNCH_INVALID');
+  assert.equal((await call(service, '/action', undefined, { headers: { 'x-workbench-launch': first.grant } })).status, 401, 'a grant is not a session token');
+  assert.equal(service.launchGrantState(first.id), 'pending');
+  assert.equal(service.pageSessions(), 0);
+  const one = (await redeem(service, first.grant)).json.result.token, two = (await redeem(service, second.grant)).json.result.token;
+  assert.deepEqual(states, ['connected', 'connected']);
+  assert.equal(service.launchGrantState(first.id), 'redeemed');
+  assert.notEqual(one, two);
+  for (const token of [one, two]) assert.equal((await call(service, '/action', undefined, { token })).status, 200);
+  assert.equal(service.pageSessions(), 2, 'a later page does not replace an earlier one');
+  const replay = await redeem(service, first.grant);
+  assert.equal(replay.status, 401); assert.equal(replay.json.error.code, 'WORKBENCH_LAUNCH_REUSED');
+  assert.equal(service.launchGrantState(first.id), 'reused');
+  assert.equal((await call(service, '/action', undefined, { token: one })).status, 401, 'the session the replayed grant created is over');
+  assert.equal((await call(service, '/action', undefined, { token: two })).status, 200);
+  for (const secret of [first.grant, second.grant, one, two]) assert.ok(!service.url.includes(secret));
+});
+
+test('a launch grant expires unused, a terminal-paired service never issues or accepts one, and a page check-in keeps a launched service alive', async t => {
+  const terminal = await launch(t);
+  assert.throws(() => terminal.issueLaunchGrant(), { code: 'WORKBENCH_LAUNCH_UNAVAILABLE' });
+  assert.equal((await redeem(terminal, 'x'.repeat(43))).status, 404);
+  const service = await launch(t, { launch: true, launchGrantMs: 40, idleTimeoutMs: 400, handlers: { alive: () => ({ alive: true }) } });
+  const late = service.issueLaunchGrant();
+  await delay(80);
+  assert.equal((await redeem(service, late.grant)).json.error.code, 'WORKBENCH_LAUNCH_INVALID');
+  assert.equal(service.launchGrantState(late.id), 'gone');
+  const token = (await redeem(service, service.issueLaunchGrant().grant)).json.result.token;
+  // The page's own check-in is enough to keep the service past its idle time.
+  for (let round = 0; round < 4; round++) { await delay(150); assert.equal((await call(service, '/action', { action: 'alive', params: {} }, { token })).status, 200); }
+  // Once the page stops checking in, the service closes by itself.
+  assert.deepEqual(await service.closed, { reason: 'idle' });
 });

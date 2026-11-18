@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // M1-A — CI is loud without being enforcing, and writes a safe append-only
 // GitHub step summary without executing API traffic.

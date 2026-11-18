@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // The public client is exercised in temporary projects. The dispatch callback
 // stops the old unsafe implementation before it can contact any remote host.

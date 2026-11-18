@@ -34,8 +34,10 @@ see [SUPPORT.md](../SUPPORT.md).
   point at `sannr mcp serve` by hand, but setup does not write their files.
 - Claude Code needs a restart to load a new MCP registration. Until then the
   `api_request` tool is absent and the installed skills fall back to the CLI.
-- The Workbench needs an interactive terminal for pairing. It does not run
-  under a pipe, an agent's shell, unattended approval or a tunneled browser.
+- `workbench open` opens the Workbench without a terminal, from an agent's
+  shell or a script. The terminal launch, `workbench` with no subcommand, still
+  needs an interactive terminal for its pairing code. Neither supports a
+  tunneled or remote browser.
 
 ## Setup without a contract
 
@@ -124,11 +126,21 @@ see [SUPPORT.md](../SUPPORT.md).
 
 ## Workbench
 
-- Local only: IPv4 loopback, ephemeral port, pairing code at the terminal,
-  authority that expires after 15 idle minutes or 8 hours. Closing the terminal
-  closes it.
+- Local only: IPv4 loopback, ephemeral port. A terminal launch pairs with a
+  code typed at the terminal; its authority expires after 15 idle minutes or 8
+  hours, and closing the terminal closes it. `workbench open` runs one
+  background process per checkout that stops 30 minutes after its last page
+  request or after 8 hours; a tab it left open then shows a not-connected
+  screen and does not reconnect by itself.
+- Each `workbench open` hands the browser a new address to open, which
+  browsers show in a new tab. It cannot bring an existing tab forward, and it
+  opens the browser only on the machine that runs the command.
 - No secret store. Credentials come from the stack's environment source; the
   page shows reference names and readiness, never values.
+- The Request view sends HTTP requests with JSON or form bodies, one at a
+  time, without assertions. It treats an empty field as missing, so it cannot
+  send an empty string as a value. Activity lists only requests made through
+  Sannr on this machine.
 - Native installers, import editing, suite and batch launch controls, surveys
   and in-flight recording are not in this release.
 

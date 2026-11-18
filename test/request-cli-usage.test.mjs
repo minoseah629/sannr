@@ -3,6 +3,7 @@
 // questions and refuse malformed argv without touching the wire. The counting
 // server below is the witness: it records every TCP connection and every parsed
 // request, so a refused method that still opened a connection would show.
+import './helpers/isolated-home.mjs';
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

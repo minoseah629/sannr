@@ -16,6 +16,7 @@
 // the first draft. Nothing implemented it, and nobody checked. These tests exist
 // so that stays checked.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";

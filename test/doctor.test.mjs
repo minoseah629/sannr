@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // `sannr doctor` — the stranger's first-hour check. It looks for the
 // common first-run mistakes and reports EACH with a concrete remedy, so a

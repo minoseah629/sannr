@@ -1,5 +1,6 @@
 // CONTEXT-2b acceptance: real CLI, isolated synthetic repositories, and loopback
 // service in its own process. No fixture credentials leave the local process tree.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Curation as a quick pass: `review` surfaces landfill candidates with WHY and
 // the confidence reason; `confirm` re-dates one, `drop`/`prune` removes only a

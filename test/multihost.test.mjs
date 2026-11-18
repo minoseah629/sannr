@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Per-host auth (F1). One client instance, many credential sets, routed by the
 // host each request actually targets.

@@ -3,6 +3,7 @@
 // loopback fake API running in its own process. Review actions use the real
 // workbench handlers; pairing uses the real local server; agent reads use the
 // CLI and the MCP stdio server. The browser DOM is covered by workbench-ui.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile, execFileSync, spawn } from 'node:child_process';

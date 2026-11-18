@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // `sannr verdict` records decisions NOT to use an API into the committed
 // file (ADR-0033). Four properties under test, each of which failed by

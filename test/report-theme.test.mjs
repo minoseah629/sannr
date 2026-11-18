@@ -1,4 +1,5 @@
 // Offline theme choices are native form controls: no script, storage or requests.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, realpathSync, rmSync } from 'node:fs';

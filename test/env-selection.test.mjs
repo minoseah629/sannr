@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { createFixtureStack } from "./helpers/stack-fixture.mjs";
 import { existsSync as setupExists } from "node:fs";

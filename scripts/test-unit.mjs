@@ -2,11 +2,24 @@
 // regressions, and test:research explicitly selects the private research rig.
 // Product qualification isolates the map CPU measurement before other files.
 import { spawn } from 'node:child_process';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync } from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { HOME_ENV_NAME, TELEMETRY_ENV_NAME } from '../lib/brand.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+export const TELEMETRY_OFF = Object.freeze({ [TELEMETRY_ENV_NAME]: '0', DO_NOT_TRACK: '1' });
+// A temporary home for one run of the suite, removed when the runner exits.
+export function isolatedEnvironment(inherited) {
+  const home = realpathSync(mkdtempSync(join(tmpdir(), 'test-run-home-')));
+  process.once('exit', () => { try { rmSync(home, { recursive: true, force: true }); } catch { /* best effort */ } });
+  const env = { ...inherited, ...TELEMETRY_OFF, HOME: home, USERPROFILE: home, npm_config_cache: join(home, '.npm'),
+    npm_config_update_notifier: 'false', [HOME_ENV_NAME]: join(home, `.state`), API_USAGE_LOG: join(home, 'usage.jsonl') };
+  const gitConfig = join(homedir(), '.gitconfig');
+  if (!inherited.GIT_CONFIG_GLOBAL && existsSync(gitConfig)) env.GIT_CONFIG_GLOBAL = gitConfig;
+  return env;
+}
 const COUNT_KEYS = ['tests', 'suites', 'pass', 'fail', 'cancelled', 'skipped', 'todo'];
 // This reviewed inventory already owns the product/research boundary. Reuse it
 // rather than maintaining a second list that can drift. Keep the original test
@@ -63,12 +76,17 @@ export function unitTestPlan(root = ROOT, { safety = false, research = false } =
     .filter(phase => phase.files.length);
 }
 
-function executePhase(phase, { root, write }) {
+export function executePhase(phase, { root, write }) {
   return new Promise(resolveResult => {
     // Node 22 also applies this to the file wrapper. A serial feedback fixture
     // can exceed one minute on hosted Windows; retain a finite per-file cap.
+    // Every test process gets its own temporary home, machine state directory,
+    // usage log and npm cache, and usage counts are off: nothing a test run
+    // starts can write to an inherited home or state directory. Each test
+    // file that starts the CLI also isolates itself (test/helpers/isolated-home.mjs);
+    // the telemetry tests turn counting on explicitly in their own fixtures.
     const child = spawn(process.execPath, ['--test', '--test-timeout=180000', '--test-reporter=tap', ...phase.files],
-      { cwd: root, stdio: ['inherit', 'pipe', 'inherit'] });
+      { cwd: root, stdio: ['inherit', 'pipe', 'inherit'], env: isolatedEnvironment(process.env) });
     const counts = {};
     let pending = '';
     const line = text => {

@@ -1,4 +1,5 @@
 // Native gRPC over ephemeral loopback sockets. No live service is contacted.
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";

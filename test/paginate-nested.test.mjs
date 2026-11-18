@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Regression for the retained Aster demo feedback: {data, pagination:{...}}
 // was reported as ok:true after only 200 of 1,297 rows. These servers are

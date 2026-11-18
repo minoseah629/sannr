@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Suite input enters only through stdin; every prospective committed file is
 // confined to a disposable project and every canary is generated in memory.

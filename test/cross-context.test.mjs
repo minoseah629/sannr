@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { createFixtureStack, fixtureContextFile } from './helpers/stack-fixture.mjs';
 // Cross-repo knowledge in the MCP answer path — global understanding at the
 // local level.

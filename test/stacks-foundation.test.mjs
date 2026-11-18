@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, symlinkSync, realpathSync } from 'node:fs';
@@ -114,7 +115,7 @@ test('a single-store repository can preview migration, apply it, and retry stack
  const command = args => {
   const result = spawnSync(process.execPath, [cli, ...args, '--json'], {
    cwd: root, encoding: 'utf8', timeout: 20_000,
-   env: { PATH: process.env.PATH, HOME: process.env.HOME, [HOME_ENV_NAME]: join(root, 'machine'),
+   env: { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: process.env.HOME, [HOME_ENV_NAME]: join(root, 'machine'),
     API_USAGE_LOG: '', NO_COLOR: '1' },
   });
   assert.ifError(result.error);

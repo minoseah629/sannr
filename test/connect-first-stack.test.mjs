@@ -1,5 +1,6 @@
 // Cold-release qualification caught connect writing a retired first store.
 // Contracts and claims are synthetic; no API request is needed for this setup.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';

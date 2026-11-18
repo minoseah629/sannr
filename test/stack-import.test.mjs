@@ -1,6 +1,7 @@
 // `stack import`: one test per acceptance scenario, through the CLI. Sources are
 // synthetic stacks in temporary directories; the Git "remote" is a local
 // repository given as a file URL. Nothing here touches the network.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';

@@ -1,4 +1,5 @@
 // Continuation reads saved metadata in a new process; it must not repeat a probe.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile, execFileSync } from 'node:child_process';

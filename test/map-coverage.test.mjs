@@ -17,6 +17,7 @@
 // three times, so `checked` divided by the declared count would overstate what
 // was covered.
 
+import './helpers/isolated-home.mjs';
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { execFile, execFileSync } from "node:child_process";

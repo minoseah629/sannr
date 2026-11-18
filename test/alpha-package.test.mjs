@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Exercise the archive handed to testers, without resolving into the checkout.
 import { test } from "node:test";

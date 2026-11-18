@@ -13,6 +13,7 @@
 // `paginate` option entirely: discovery.pages did not exist and counts were
 // one page's worth.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

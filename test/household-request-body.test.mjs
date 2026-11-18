@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -36,7 +37,7 @@ async function fixture(t) {
     wrong: { baseUrl, headers: { 'X-Fixture-Tenant': 'wrong' } },
     fixture: { baseUrl, auth: 'bearer:FIXTURE_TOKEN', headers: { 'X-Fixture-Tenant': 'blue' } },
   } }));
-  const env = { PATH: process.env.PATH, HOME: home, API_CONFIG: config, API_CONTEXT_OFF: '1',
+  const env = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: home, API_CONFIG: config, API_CONTEXT_OFF: '1',
     API_EVIDENCE: evidence, API_USAGE_LOG: '', API_FRICTION_OFF: '1', FIXTURE_TOKEN: PRIVATE };
   const run = async (lowLevel, args) => {
     try {
@@ -61,7 +62,7 @@ async function fixture(t) {
   const runUnconfigured = async (lowLevel, args) => {
     const guard = join(dir, 'no-fetch.mjs');
     writeFileSync(guard, "globalThis.fetch = () => { throw new Error('UNEXPECTED_FIXTURE_DISPATCH'); };\n");
-    const freshEnv = { PATH: process.env.PATH, HOME: home, API_USAGE_LOG: '' };
+    const freshEnv = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: home, API_USAGE_LOG: '' };
     try {
       const out = await execute(process.execPath, ['--import', pathToFileURL(guard).href,
         lowLevel ? REQUEST : CLI, ...(lowLevel ? [] : ['request']), ...args], { cwd: dir, env: freshEnv, timeout: 10000 });

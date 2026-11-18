@@ -8,6 +8,7 @@
 // rather than imported silently green. Determinism is pinned because a
 // migration you can diff is a migration you can review.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { importPostman, importBruno, importInsomnia, importPostmanV3,

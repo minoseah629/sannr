@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Client defaults from a project config file, with a three-level precedence:
 // an explicit environment variable beats the config file's `defaults` block

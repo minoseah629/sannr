@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { createFixtureStack, fixtureContextFile } from "./helpers/stack-fixture.mjs";
 // Provenance on every written claim, and AGE as a second staleness axis

@@ -1,4 +1,5 @@
 // R7 fixtures use declared example.test origins, disposable files and no traffic.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, existsSync, statSync, symlinkSync } from 'node:fs';

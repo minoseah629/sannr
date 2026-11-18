@@ -17,6 +17,7 @@
 // because module-load state (local context) versus per-request state (the
 // registry, the provider file) is exactly what these scenarios stress.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn, execFileSync } from "node:child_process";
@@ -29,7 +30,7 @@ import { fileURLToPath } from "node:url";
 
 import { HOME_ENV_NAME, TOOL_NAME } from "../lib/brand.mjs";
 import { CONTEXT_FILE } from "../lib/context.mjs";
-import { emptyRegistry, registerRepo, saveRegistry, grant as addGrant } from "../lib/registry.mjs";
+import { emptyRegistry, loadRegistry, registerRepo, saveRegistry, grant as addGrant } from "../lib/registry.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CLI = join(ROOT, "bin", "cli.mjs");
@@ -395,10 +396,18 @@ test("a provider root that became a plain FILE, and a knowledge file that is a s
 test("a global home that is empty, a file, or a path with spaces never breaks the request", async () => {
   const f = await httpFixture((req, res) => jsonReply(res, { ok: true }));
   try {
-    // Empty override falls back to the REAL ~/.<product>. Read-only there: the
-    // scratch consumer cannot be registered in it, so the lookup dead-ends at
-    // the unregistered-consumer gate — and must do so quietly.
+    // Empty override falls back to the default ~/.<product> of the home the
+    // process runs with (this file's isolated home). That registry is real and
+    // populated, but lacks the scratch consumer, so the lookup dead-ends at the
+    // unregistered-consumer gate — and must do so quietly.
     {
+      const fallback = { ...process.env };
+      delete fallback[HOME_ENV_NAME];
+      const other = repo({ name: "unrelated" });
+      const registry = loadRegistry(fallback).registry;
+      registerRepo(registry, other, { name: "unrelated" });
+      saveRegistry(registry, fallback);
+      assert.ok(Object.keys(loadRegistry(fallback).registry.repos).length >= 1, "the default registry has a repository");
       const a = repo({ name: "storefront" });
       const { env } = await oneCall({ consumer: a, home: "", base: f.origin }, { path: "/invoices" });
       assert.equal(env.status, 200, "empty home: request must execute");

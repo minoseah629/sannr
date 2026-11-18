@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // DEP-1 uses the actual artifact in a fresh project with an empty npm cache.
 // Loopback traffic goes through the installed public CLI; all records stay in

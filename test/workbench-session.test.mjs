@@ -2,6 +2,7 @@
 // with the client's shape, real notes written by the CLI citing them, and a
 // real git repository for the uncommitted-knowledge footer. No request leaves
 // the machine; no value from a request or response may reach the model.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';

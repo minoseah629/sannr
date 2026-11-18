@@ -1,6 +1,7 @@
 // MAP-1C pure rules: which values can link a key, how parameter values are
 // derived, how response fields are named, how the source is chosen and how
 // links merge into a record within bounds. Every value here is synthetic.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { KEY_SOURCE_BOUNDS, eligibleValue, deriveParameterValues, fieldValues, carriedValues, chooseSources,

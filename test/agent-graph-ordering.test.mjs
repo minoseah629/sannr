@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { captureGraphStackFixture, recordGraphStackFixture } from './helpers/graph-stack-fixture.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import test from 'node:test';

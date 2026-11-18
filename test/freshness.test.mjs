@@ -8,6 +8,7 @@
 // changed twice since, shape hash diverged" must be distinguishable without
 // reading git yourself.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { freshnessFor, confidenceFor } from "../lib/context.mjs";

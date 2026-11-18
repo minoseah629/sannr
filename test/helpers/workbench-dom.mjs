@@ -125,13 +125,39 @@ export function createWorkbenchDom({ product = 'Product' } = {}) {
 }
 
 /** Load the packaged page script into a fresh context whose fetch reaches the
- * given engine handlers in this process, as the loopback server would. */
-export function loadWorkbenchPage(handlers, { dark = false, product = 'Product', innerWidth } = {}) {
+ * given engine handlers in this process, as the loopback server would.
+ *
+ * `launch` loads the page of a background service (`workbench open`) instead of
+ * a terminal-paired one: { hash, storage, grants, tokens }. `hash` is the URL
+ * fragment the tab was opened with; `storage` is the tab's sessionStorage (a
+ * Map a test keeps across loads to stand for a reload); `grants` maps each
+ * unused launch grant to the token it yields, once; `tokens` is the set of
+ * session tokens the service accepts; `frozenAddress` makes the browser refuse
+ * to rewrite the address bar, and `noStorage` gives the tab no sessionStorage
+ * at all. The returned `address` is what the address bar
+ * holds, and `wire` lists every request path with its headers. */
+export function loadWorkbenchPage(handlers, { dark = false, product = 'Product', innerWidth, launch = null } = {}) {
   const { document, dispatch } = createWorkbenchDom({ product });
+  const wire = [], address = { hash: launch?.hash ?? '', pathname: '/', search: '' };
+  if (launch) {
+    document.documentElement.setAttribute('data-launch', 'service'); document.documentElement.setAttribute('data-cli', 'tool');
+    launch.storage ??= new Map(); launch.grants ??= new Map(); launch.tokens ??= new Set();
+  }
   const copied = [], calls = [], windowListeners = new Map();
   const pendingFetches = new Set();
   const media = { matches: dark, listeners: [], addEventListener(type, fn) { this.listeners.push(fn); } };
-  const respond = async (path, body) => {
+  const respond = async (path, body, headers = {}) => {
+    wire.push({ path, headers: { ...headers } });
+    if (launch) {
+      if (path === '/launch/redeem') {
+        const grant = headers['x-workbench-launch'], token = launch.grants.get(grant);
+        if (!token) return { ok: false, error: { code: 'WORKBENCH_LAUNCH_INVALID', next_action: 'Open the workbench again.' } };
+        launch.grants.delete(grant); launch.tokens.add(token);
+        return { ok: true, result: { connected: true, token } };
+      }
+      if (path !== '/action') return { ok: false, error: { code: 'WORKBENCH_ROUTE', next_action: 'Use the packaged workbench interface.' } };
+      if (!launch.tokens.has(headers['x-workbench-token'])) return { ok: false, error: { code: 'WORKBENCH_AUTH_REQUIRED', next_action: 'Open the workbench again.' } };
+    }
     if (path === '/pair/start') return { ok: true, result: { code: 'TEST-CODE', nonce: 'nonce' } };
     if (path === '/pair/complete') return { ok: true, result: { paired: true, token: 'token' } };
     calls.push(body.action);
@@ -142,7 +168,14 @@ export function loadWorkbenchPage(handlers, { dark = false, product = 'Product',
   };
   const window = { addEventListener(type, fn) { if (!windowListeners.has(type)) windowListeners.set(type, []); windowListeners.get(type).push(fn); },
     removeEventListener(type, fn) { windowListeners.set(type, (windowListeners.get(type) ?? []).filter(item => item !== fn)); } };
+  const storage = launch && { getItem: key => launch.storage.has(key) ? launch.storage.get(key) : null,
+    setItem: (key, value) => { launch.storage.set(key, String(value)); }, removeItem: key => { launch.storage.delete(key); } };
   const context = createContext({ document, window, innerWidth,
+    ...(launch ? { location: address, ...(launch.noStorage ? {} : { sessionStorage: storage }), URLSearchParams, setInterval: () => 0,
+      // The page rewrites the address bar; only the path and query remain.
+      history: { replaceState: (_state, _title, url) => {
+        if (launch.frozenAddress) throw new Error('The address cannot be rewritten.');
+        address.hash = String(url).includes('#') ? String(url).slice(String(url).indexOf('#')) : ''; } } } : {}),
     navigator: { clipboard: { writeText: async text => { copied.push(text); } } },
     matchMedia: () => media, setTimeout: (fn, ms) => {
       // Pairing's simulated poll has no clock dependency. A real zero-delay
@@ -151,7 +184,7 @@ export function loadWorkbenchPage(handlers, { dark = false, product = 'Product',
       const timer = setTimeout(fn, ms); timer.unref?.(); return timer;
     }, clearTimeout,
     fetch: (path, options) => {
-      const request = respond(path, JSON.parse(options.body)).then(result => ({ json: async () => result }));
+      const request = respond(path, JSON.parse(options.body), options.headers).then(result => ({ json: async () => result }));
       pendingFetches.add(request);
       request.then(() => pendingFetches.delete(request), () => pendingFetches.delete(request));
       return request;
@@ -164,7 +197,9 @@ export function loadWorkbenchPage(handlers, { dark = false, product = 'Product',
     await new Promise(resolve => setImmediate(resolve));
   } };
   const q = selector => document.querySelector(selector), all = selector => document.querySelectorAll(selector);
-  return { document, context, copied, calls, media, settle, q, all,
+  return { document, context, copied, calls, media, settle, q, all, address, wire,
+    // A launch lands in this already loaded tab: only the fragment changes.
+    async arrive(hash) { address.hash = hash; for (const fn of windowListeners.get('hashchange') ?? []) await fn({ type: 'hashchange' }); await settle(); },
     // A pointer click: mousedown, then click, as a browser delivers them. When
     // the mousedown removed the pressed control from the page, the browser
     // delivers no click to it, so neither does this.

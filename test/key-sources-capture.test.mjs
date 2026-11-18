@@ -3,6 +3,7 @@
 // detail operation's record learns which response field supplied the key. All
 // data is synthetic; marker values must never reach the store or any output
 // except the API response the agent asked for.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';

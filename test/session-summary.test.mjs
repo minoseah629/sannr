@@ -2,6 +2,7 @@
 // are pinned against synthetic ledger fixtures with the client's file shapes,
 // and the end-to-end shape against a real MCP host process whose numbers must
 // equal `sessions --json` for the same session. No request leaves loopback.
+import './helpers/isolated-home.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -48,7 +49,7 @@ function project(t) {
   writeFileSync(join(dir, 'stack.json'), JSON.stringify({ v: 1, name: 'alpha', default_environment: 'local', contract: 'openapi.json',
     environments: { local: { baseUrl: `${origin}/alpha`, auth: 'bearer:SUMMARY_TEST_TOKEN' } } }));
   writeFileSync(join(dir, CONTEXT_BASENAME), JSON.stringify({ v: 0, api: { name: 'alpha' }, operations: {} }));
-  const env = { PATH: process.env.PATH, HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'home', 'machine'), TZ: 'UTC', NO_COLOR: '1',
+  const env = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'home', 'machine'), TZ: 'UTC', NO_COLOR: '1',
     API_CONTEXT_DIR: root, API_TIMEOUT_MS: '2000', SUMMARY_TEST_TOKEN: TOKEN };
   return { root, env };
 }
@@ -126,7 +127,7 @@ test('the summary has the fixed shape, merges failures once per call and counts 
   assert.equal(summary.refusals, 1);
   assert.equal(summary.left_behind, 0);
   assert.equal(summary.line, `${PROSE_PRODUCT_TITLE}: 7 requests · 4 failed · 2 notes added, 1 corrected`);
-  assert.match(summary.open, /^Open in Workbench: .*workbench$/);
+  assert.match(summary.open, /^Open in Workbench: .*workbench open$/);
   assert.ok(![first, second, correction].some(id => JSON.stringify(summary).includes(id)), 'note identities stay in the ledger');
   assertNoValues(JSON.stringify(summary));
 
@@ -200,12 +201,12 @@ test('a process that made no call summarizes honestly as zero with no start time
 test('the Workbench hint advertises a verified portable CLI or a terminal instruction without inventing a bare executable', t => {
   const fixture = project(t);
   const empty = buildSessionSummary(fixture.root, { env: fixture.env });
-  assert.equal(empty.open, "Open in Workbench: use your installed CLI from a terminal in this repository to run workbench");
+  assert.equal(empty.open, "Open in Workbench: use your installed CLI in this repository to run workbench open");
   const shim = join(fixture.root, 'node_modules', '.bin', PRODUCT);
   mkdirSync(dirname(shim), { recursive: true });
   writeFileSync(shim, '#!/bin/sh\nexit 0\n'); chmodSync(shim, 0o755);
   const installed = buildSessionSummary(fixture.root, { env: fixture.env });
-  assert.equal(installed.open, `Open in Workbench: ${POINTER_CLI_NAME} workbench`);
+  assert.equal(installed.open, `Open in Workbench: ${POINTER_CLI_NAME} workbench open`);
   assert.ok(!installed.open.includes('--show'));
 });
 

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { withFixtureProjection, fixtureEvidencePath } from './helpers/stack-fixture.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import { test } from 'node:test';

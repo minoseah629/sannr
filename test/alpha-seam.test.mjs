@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT, layoutFor } from "../lib/layout.mjs";
 import { writeFileSync } from "./helpers/layout-fixture.mjs";
 import { test } from 'node:test';

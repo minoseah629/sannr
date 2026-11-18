@@ -1,6 +1,7 @@
 // MAP-1C capture-time linking over synthetic private evidence: the window of
 // newest earlier runs, the per-file size bound, the time budget, read problems
 // and scope. Evidence files are fixtures built here; nothing leaves the temp dir.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { linkSync, lutimesSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs';

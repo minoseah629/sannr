@@ -1,4 +1,5 @@
 // STACKS-2(d): genuine independent stacks; all sources are synthetic local files.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, realpathSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';

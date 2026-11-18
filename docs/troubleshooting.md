@@ -119,10 +119,20 @@ when you no longer need it.
 
 ## The Workbench refuses with `WORKBENCH_TERMINAL_REQUIRED`
 
-Run `npx @sannr/sannr workbench` in an interactive terminal, not through an
-agent, a pipe or a script. Pairing needs the code typed at that terminal. If
-the browser lost pairing (15 idle minutes, or 8 hours), choose **Pair again**
-in the page and enter the new code at the same terminal.
+`workbench` with no subcommand pairs by a code typed at an interactive
+terminal, so it refuses under an agent, a pipe or a script. Use
+`npx @sannr/sannr workbench open` there instead: it needs no terminal. If a
+terminal-paired browser lost pairing (15 idle minutes, or 8 hours), choose
+**Get a new code** in the page and enter the new code at the same terminal.
+
+## The page says "This tab is not connected"
+
+The tab was opened on the plain local address, or its Workbench has stopped
+(30 minutes after its last page request, after 8 hours, or by
+`workbench stop`). Say "open the workbench" to your coding agent or run
+`npx @sannr/sannr workbench open` in that repository; a new tab opens
+connected. `workbench status` shows whether one is running. The other
+`workbench open` results are listed in [the Workbench guide](workbench.md#open-in-one-step).
 
 ## A request refuses before sending
 

@@ -10,6 +10,7 @@
 // Every test here was confirmed to FAIL against the pre-rewrite parser except
 // where marked as a pin on behaviour that already held.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync } from "node:fs";

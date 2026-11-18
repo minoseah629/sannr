@@ -10,6 +10,105 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) headings,
 
 ## [Unreleased]
 
+- Usage counts. Unless turned off, Sannr sends one document a day to
+  `https://sannr.dev/api/v1/usage`: a random install identifier that links one
+  day's document to the next, the version, operating system and processor
+  family, Node major version, the previous send date, how many times each
+  command and MCP tool ran under the fixed names in `lib/usage-features.json`,
+  and how many API requests it executed; nothing about repositories, APIs or
+  requests. The contract ships as `lib/usage.schema.json`. Nothing is counted
+  or sent until a one-time notice has been printed (in `connect` output, once
+  on standard error, or as an extra text block in the MCP server's first tool
+  result), and the first document waits 24 hours after it. On macOS and
+  Linux no notice is recorded when the stream it would be written to is the
+  null device (standard error, or standard output for `connect`); on Windows
+  a stream sent to `NUL` is not detected and the notice is recorded as
+  before. A notice whose write to standard error fails is not recorded.
+  Nothing is counted, sent or shown in a process started with
+  `API_CONTEXT_PRODUCT_NAME` set (a test seam), and the sender's user agent
+  is a fixed name, not one read from the environment. The MCP server attaches none to a tool call made by `mcp inspect`,
+  and records none; one that reaches `mcp inspect` anyway (through a proxy
+  that renamed it, or in the output of a Sannr command given as its target)
+  is printed on its standard error. `sannr telemetry
+  off` (or telling the agent "opt out") writes an off marker that holds for
+  every Sannr process run with the same home directory until `telemetry on`,
+  marks at once every other state directory on that home's list (the CLI and
+  the MCP server record the directory they use; at most 256, only directories
+  that exist), never waits
+  for a send in progress, and sends nothing (a document being prepared or on
+  its way may still go out within a few seconds); `SANNR_TELEMETRY=0`,
+  `DO_NOT_TRACK=1`, CI environments, processes a test runner marks
+  (`NODE_TEST_CONTEXT`, `VITEST`, `JEST_WORKER_ID`), a source tree of Sannr
+  (with or without `.git`), a process whose environment names no home
+  directory (`HOME`, or `USERPROFILE` on Windows, missing or empty) and any
+  `--dry-run` turn it off per process, and a command run with `--offline` starts no send. When off
+  cannot be recorded for the home directory, `telemetry off` says where it did
+  hold and exits 1. New `sannr telemetry` command:
+  `status`, `show` (the exact next document), `off`, `on`, `reset`. A detached
+  process sends it, so no command waits for it or changes its output or exit
+  code. The install prompt, README, privacy, network behavior, feedback and
+  security pages say so; see `docs/telemetry.md`. `capabilities` lists the new
+  destination and state files, and the pointer block `connect` writes gains
+  one line saying what "opt out" means.
+- Usage counts and the Workbench launch: `workbench` counts one per launch
+  (`sannr workbench` or `workbench open`); `workbench status` and `workbench
+  stop` are not counted. The background Workbench process that an open starts
+  is never counted and never shows or records the one-time notice, so on a
+  machine not yet told the notice reaches the `workbench open` command's
+  standard error or the MCP server's tool result.
+- The generated `.sannr/README.md` guide now reads "There's no account, and
+  this knowledge is never sent to Sannr" instead of "There's no account and no
+  Sannr server", so connected repositories see a one-line change in that
+  committed file the next time `connect` or `migrate` refreshes it.
+- `connect`'s closing line now reads "I live in your repo, and what I learn
+  about your APIs stays here; on my own I send only a daily usage count (see
+  telemetry)" instead of "there's no server on my end, and I haven't phoned
+  anyone yet".
+- No released version wrote `telemetry.json` or `telemetry.off`; every record
+  format before this release was a development build, so none is migrated.
+- `workbench open` opens a repository's Workbench in one step, with no
+  interactive terminal and no pairing code, so a coding agent can do it when
+  asked to "open the workbench". It starts a background Workbench for the
+  checkout, or reuses the one already running, and opens a connected page in
+  the default browser. Each checkout has its own, several can run at once, and
+  `--project <path>` names another local checkout. `workbench status` and
+  `workbench stop` report on and close one checkout's Workbench; it also stops
+  30 minutes after its last page request and after eight hours. The
+  `api_workbench` MCP tool gains `open` and `stop` for the repository its
+  server is bound to, and refuses another checkout by name
+  (`WORKBENCH_REPOSITORY_MISMATCH`) instead of opening it. Results name the
+  repository, whether the instance was created or reused, the plain local URL,
+  and the browser outcome, with an accepted opener request kept apart from a
+  page that actually connected. The installed skill now tells an agent how to
+  choose the repository from the conversation and to open it itself.
+- Security model of that path, which differs from the terminal launch: the
+  page connects with a one-use, two-minute launch grant passed in the URL
+  fragment and removed from the address bar at once; the tab keeps its session
+  token in `sessionStorage`, so a reload stays connected; several tabs can be
+  connected together; and any process running as you in the checkout can ask
+  for a launch, where the terminal launch needs a code typed by a person. The
+  plain URL still grants nothing. The control endpoint of a running Workbench
+  now sits in a directory only its owner can enter. `sannr workbench` with no
+  subcommand keeps its typed pairing code and is unchanged, except that its
+  refusal without a terminal now names `workbench open`. See
+  `docs/workbench-security.md`.
+- A session summary's `open` line now names `workbench open`, which needs no
+  pairing code, in place of the terminal launch.
+- The Workbench page gains two views beside Workbench and Map. **Activity**
+  lists the requests this machine's ledger retains, newest first, with the
+  caller, status and checks, a Failed filter, and the recorded response read
+  only on **Show response**. **Request** sends a request by hand: fields built
+  from the current contract, one explicit send through the same client and
+  policy as the CLI and the MCP tool, the masked response beside it, an
+  advanced structure editor, and save, rename and delete for saved requests.
+  Entered values stay in the tab and are never saved. The page still opens on
+  the Workbench view, and opening a view sends no request. See
+  `docs/workbench.md` and `docs/workbench-security.md`.
+- On the Workbench view, **Review decision** under a note records trust, a
+  dispute, a request for a run or a retirement to the ledger, as `review` does
+  headlessly: attributed to the author marker as a person, with a second
+  confirmation before a retirement, and no API request. A refusal writes
+  nothing and is shown with its code. Batches and supersession stay headless.
 - `stack import <source>` installs one or more stacks from another repository:
   a local path (a repository, its stacks directory or one stack folder) or a
   Git URL fetched with your own `git`, named on stderr before it runs.

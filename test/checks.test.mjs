@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Disagreement detectors: contract-vs-server and contract-vs-history.
 //

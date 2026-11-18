@@ -19,7 +19,8 @@ wrong. That is the whole report.
 
 ## A local report first; an optional send
 
-No account, no telemetry. The only thing it sends us is feedback. Running
+No account. Feedback is optional and asks first; the separate daily usage
+counts carry no report content. Running
 `sannr feedback` still writes a local report without sending it. Offer the
 optional send after reviewing what the session actually showed; do not send
 merely because this skill loaded or the session ended.

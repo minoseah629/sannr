@@ -3,6 +3,7 @@
 //
 //   node --test test/connect-ci.test.mjs
 
+import './helpers/isolated-home.mjs';
 import test, { after } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";

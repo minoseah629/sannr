@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-product="__PRODUCT__">
+<html lang="en" data-product="__PRODUCT__" data-launch="__LAUNCH__" data-cli="__CLI__">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -11,7 +11,7 @@
   <div id="pairing" class="pairing">
     <div class="pair-card">
       <div class="pair-title">__PRODUCT__ Workbench</div>
-      <p class="pair-lead">Pair this browser with the terminal where you launched the workbench. Opening a page never sends an API request.</p>
+      <p class="pair-lead" id="pair-lead">Pair this browser with the terminal where you launched the workbench. Opening a page never sends an API request.</p>
       <div class="pair-code-box">
         <div id="pair-status" role="status">Preparing a pairing code…</div>
         <button id="pair-copy" class="pair-copy" type="button" aria-label="Copy pairing code" title="Copy pairing code" hidden>

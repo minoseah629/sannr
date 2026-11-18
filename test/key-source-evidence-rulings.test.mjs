@@ -2,6 +2,7 @@
 // the 256 newest earlier run files (any scope), the budget covers the listing,
 // the backfill replays the same window, and pins for the consumer rules and
 // the shared reader's changed-during-read check. Fixtures live in temp dirs.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs, { appendFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, utimesSync, writeFileSync } from 'node:fs';

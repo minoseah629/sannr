@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // First-run setup, exercised only in disposable repositories. These checks
 // deliberately configure a live local fixture to prove setup stays static.

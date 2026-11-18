@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Exercise the public client and MCP boundary in isolated projects, with real
 // loopback HTTP/WebSocket peers. No installed demo or external API is used.

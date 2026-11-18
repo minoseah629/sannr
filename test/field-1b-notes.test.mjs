@@ -1,4 +1,5 @@
 // FIELD-1b EXIT-001 / CLI-009: offline synthetic note/refusal receipts.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';

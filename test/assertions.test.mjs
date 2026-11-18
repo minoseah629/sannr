@@ -1,4 +1,5 @@
 // Unit tests for the assertion engine. node --test test/assertions.test.mjs
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { atPath, checkOne, runAssertions } from "../lib/assertions.mjs";

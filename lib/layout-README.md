@@ -1,6 +1,6 @@
 # Sannr project API knowledge
 
-Sannr is the librarian for this repo's APIs, and this folder is the shelf: the things a teammate or a coding agent found out about the APIs this code talks to, kept beside the code so they don't leave when the person who knew them does. The job is plain: an agent writes a lesson down while it works, and the next one reads it before it starts. There's no account and no Sannr server; these files are all there is, and the paths below follow this project's name and collection settings.
+Sannr is the librarian for this repo's APIs, and this folder is the shelf: the things a teammate or a coding agent found out about the APIs this code talks to, kept beside the code so they don't leave when the person who knew them does. The job is plain: an agent writes a lesson down while it works, and the next one reads it before it starts. There's no account, and this knowledge is never sent to Sannr; these files are all there is, and the paths below follow this project's name and collection settings.
 
 {{LAYOUT_TABLE}}
 

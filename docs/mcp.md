@@ -25,16 +25,41 @@ messages, without an install banner. Project paths and setup binding come from
 the registration's environment. Use [install](install.md) for older
 Node or cached-server registrations and for host activation checks.
 
-### Workbench presence and handoff
+### Workbench: open, presence and handoff
 
-The ordinary writable binding exposes `api_workbench` for explicit `attach`,
-`status`, `read`, `ack` and `detach`. Read-only librarian bindings do not expose
-this tool; browser controls cannot widen their permissions. `sannr workbench`
-launches independently in an interactive terminal and works without an attached
-agent. `attach` optionally writes a presence record for this MCP peer, using the
-host name from `clientInfo`, a task label and a periodically refreshed heartbeat.
-It is not a verified model or conversation identity. `detach` or stdin closure
-removes that presence; neither closes the terminal-owned workbench.
+The ordinary writable binding exposes `api_workbench` for `open`, `stop`,
+`attach`, `status`, `read`, `ack`, `detach`, `summary` and `show`. Read-only
+librarian bindings do not expose this tool; browser controls cannot widen their
+permissions.
+
+`open` is the deliberate launch, for when the person asks to open the
+workbench. It starts the bound repository's background workbench or reuses the
+running one, asks the system opener for a connected browser page, and returns
+the repository, whether the instance was created or reused, the plain local
+URL and the browser and page outcome. It sends no API request. The tool opens
+only the repository its server is bound to: pass `project` with the checkout
+path the agent resolved, and a different checkout is refused with
+`WORKBENCH_REPOSITORY_MISMATCH` (the error's `details` name both paths) instead
+of being opened by mistake. For that other checkout, run its CLI:
+`sannr workbench open --project <path> --json`. Optional `view`, `stack` and
+`operation` choose what the page shows first. A result with `ok: false` that
+still carries `instance` and `url` means the workbench is running but the
+browser could not be opened. `stop` closes the bound repository's background
+workbench. The service keeps running after the MCP peer disconnects.
+
+```json
+{"action":"open","project":"/path/to/checkout"}
+{"action":"open","project":"/path/to/checkout","view":"map"}
+{"action":"stop"}
+```
+
+`show` is informational and launches nothing: it offers a session to a
+workbench that is already open. `sannr workbench` also launches independently
+in an interactive terminal and works without an attached agent. `attach`
+optionally writes a presence record for this MCP peer, using the host name from
+`clientInfo`, a task label and a periodically refreshed heartbeat. It is not a
+verified model or conversation identity. `detach` or stdin closure removes that
+presence; neither closes a workbench.
 
 Operator changes wait in the repository's durable local inbox, grouped by the
 operator launch ID. `status`, `read` and `ack` work without attaching presence.
@@ -45,7 +70,8 @@ native-channel extension, remote callback or automatic model wake is used.
 
 See [the workbench workflow](workbench.md). After replacing an installed server,
 restart the host and confirm `api_workbench` is actually listed before using its
-presence or handoff actions. Its absence does not prevent terminal launch.
+actions. Its absence does not prevent `sannr workbench open` or the terminal
+launch from the CLI.
 
 ### Rotating credentials
 

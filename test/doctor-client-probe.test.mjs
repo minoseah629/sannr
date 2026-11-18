@@ -1,4 +1,5 @@
 // Doctor must exercise the shipped client with announced, bounded fixture reads.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile, execFileSync } from 'node:child_process';

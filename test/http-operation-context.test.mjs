@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT as REPO_LAYOUT } from "../lib/layout.mjs";
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

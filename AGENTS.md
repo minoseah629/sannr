@@ -37,15 +37,33 @@ process is in [CONTRIBUTING.md](CONTRIBUTING.md).
   limitations behind any result. Fixture checks do not establish real-world
   accuracy, savings, or superiority. Research is maintained separately and is
   not included in this product repository.
-- **No account, no telemetry.** The only thing Sannr sends us is feedback, which
+- **No account; two things are sent to us, and both are disclosed.** Feedback
   is optional and asks first: a report goes out only through an explicit
   `feedback --send`, which stops for a human yes by default
-  (`feedback.send: ask | allow | never`). Install, requests, schedules and
-  session end send us nothing; requests go only to the API being called, and
-  `doctor` announces its one probe before sending it. Collection stays
-  local: a test asserts `lib/feedback.mjs` has no network capability, and only
-  the API client's pinned feedback path may transmit the report, after writing
-  its receipt. Keep both true. See [docs/feedback.md](docs/feedback.md).
+  (`feedback.send: ask | allow | never`). Collection stays local: a test
+  asserts `lib/feedback.mjs` has no network capability, and only the API
+  client's pinned feedback path may transmit the report, after writing its
+  receipt. The daily usage document (`lib/telemetry.mjs`,
+  [docs/telemetry.md](docs/telemetry.md)) is on unless turned off, never sent
+  before the one-time notice and 24 hours, exactly `lib/usage.schema.json` and
+  nothing else: names from `lib/usage-features.json`, counts, an API call
+  count, version, platform and a random install identifier. Never add a field,
+  a name taken from input, or an endpoint setting; `telemetry off`,
+  `SANNR_TELEMETRY=0`, `DO_NOT_TRACK=1` and CI stop it. A source tree of this
+  repository, with or without `.git`, and any process a test runner marks
+  never count or send. The test runner gives every test process its own home,
+  state directory and usage log; every test file imports
+  `test/helpers/isolated-home.mjs` as its first import, however the file is
+  laid out (`test/test-isolation.test.mjs` fails for one that does not), which
+  also gives every process a test starts through `node:child_process` with a
+  hand-built environment the isolated home and the off switch. It cannot reach
+  a shell command that unsets `HOME`, a process the test did not start, or a
+  test deleting its own `HOME`; a process with no home directory in its
+  environment never counts, sends or writes telemetry state. Only
+  `test/telemetry.test.mjs` turns counting on, naming this checkout in
+  `SANNR_TELEMETRY_CHECKOUT`, with an isolated `SANNR_HOME` and `HOME`. Requests otherwise go only to
+  the API being called, and `doctor` announces its one probe before sending
+  it. Keep all of this true. See [docs/feedback.md](docs/feedback.md).
 
 ## Map of the repo
 

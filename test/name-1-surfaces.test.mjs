@@ -1,5 +1,6 @@
 // NAME-1 acceptance (f), (h), (i), and the brand boundary behind (j).
 // All requests are to a witness in a separate asynchronously spawned process.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile, execFileSync, spawn } from 'node:child_process';

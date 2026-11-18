@@ -163,7 +163,7 @@ WARN rows visible when you report the result.
 | No API configured | One unauthenticated `GET https://api.github.com/zen` to GitHub's public service. |
 | A configured base URL | Unauthenticated HEAD to that URL; one separately announced GET fallback only if HEAD fails at the transport layer. |
 | `--probe <url>` | One unauthenticated GET to your chosen URL, overriding either target above. |
-| `--offline` | No API probe; local checks still run, including starting the registered MCP process once to check that it initializes. |
+| `--offline` | No API probe and no daily usage send; local checks still run, including starting the registered MCP process once to check that it initializes. |
 
 Probes send no configured credentials, cookies or static headers, obtain no
 OAuth tokens, follow no redirects and do not retry. A received response creates

@@ -10,6 +10,7 @@
 // absolute paths. A single leaked bearer token in a file someone forwards over
 // Slack would end the alpha and deserve to.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildFeedback, renderFeedback, readUsage, wiredHosts } from "../lib/feedback.mjs";

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Setup specimens use disposable projects and execute no API requests.
 import { test } from "node:test";

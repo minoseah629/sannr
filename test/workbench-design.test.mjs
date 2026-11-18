@@ -1,6 +1,7 @@
 // The Workbench page as a user observes it: the packaged script runs against
 // the real engine handlers over a synthetic lab repository (no network, no
 // real home directory). One test per acceptance scenario in the DESIGN-1 brief.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, existsSync, writeFileSync } from 'node:fs';
@@ -50,13 +51,14 @@ async function selectRow(page, operation, stack) {
   return row.getAttribute('data-note-row');
 }
 
-test('pairing opens the Workbench with three columns and its trace, no other screen, and Mismatch first when it has notes', async t => {
+test('pairing opens the Workbench view with three columns and its trace, beside Activity, Request and Map, and Mismatch first when it has notes', async t => {
   const { root } = lab(t), page = await open(root);
   assert.equal(page.q('#app').hidden, false);
   assert.equal(page.text('[data-product-title]'), 'Product Workbench');
   for (const column of ['list', 'note', 'trace']) assert.ok(page.q(`[data-col="${column}"]`), column);
   assert.ok(page.all('[data-step]').length >= 3, 'the trace is drawn for the selected note');
-  assert.deepEqual(page.all('.switch button').map(node => node.getAttribute('data-mode')), ['workbench', 'map']);
+  assert.deepEqual(page.all('.switch button').map(node => node.getAttribute('data-mode')), ['workbench', 'activity', 'request', 'map']);
+  assert.equal(page.q('.switch button[aria-pressed="true"]').getAttribute('data-mode'), 'workbench', 'the notes view is where the page opens');
   assert.equal(page.all('[data-screen]').length, 0, 'no screen router remains');
   assert.ok(pressed(page, '[data-filter="attention"]'));
   assert.ok(rows(page).every(node => ['mismatch', 'partial'].includes(node.getAttribute('data-state'))));

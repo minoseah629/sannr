@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { MCP_SERVER_KEY } from '../lib/brand.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Independent regression for the fresh-host pilot's CLI/MCP contract split.

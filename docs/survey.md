@@ -1,8 +1,9 @@
 # Portable API survey
 
 The survey is an explicit, historical graph of API structure in your repository.
-Sannr sends no requests, starts no application and resolves no credentials to
-generate it. It reuses the conservative source/contract join described in [discovery](discovery.md); it is not a
+Sannr sends no API requests, starts no application and resolves no credentials
+to generate it (a daily usage document that happens to be due is separate; see
+[telemetry](telemetry.md)). It reuses the conservative source/contract join described in [discovery](discovery.md); it is not a
 complete language parser or a runtime trace.
 
 ## Generate, check, inspect

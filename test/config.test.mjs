@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Unit tests for named environments. node --test test/config.test.mjs
 import { test } from "node:test";

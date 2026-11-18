@@ -1,6 +1,7 @@
 // STACKS-1B integration specimens contain synthetic structure only. Legacy
 // records are authored as fixtures; migration must not reinterpret them as
 // newly executed observations. Only child-process loopback witnesses do I/O.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync, rmSync, realpathSync, statSync } from 'node:fs';
@@ -30,7 +31,7 @@ const writeJson = (path, value, mode) => { mkdirSync(dirname(path), { recursive:
 function project(t) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'stacks-1b-')));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  const env = { PATH: process.env.PATH, HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'machine'),
+  const env = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'machine'),
     API_CONTEXT_DIR: root, API_USAGE_LOG: '', NO_COLOR: '1',
     FIXTURE_ALPHA_TOKEN: secrets[0], FIXTURE_BETA_TOKEN: secrets[1] };
   mkdirSync(env.HOME, { recursive: true });

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Edges are the map (ADR-0034): who calls whom, derived from source not declared.
 //

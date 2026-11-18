@@ -14,6 +14,7 @@
 // Wording: show and the map describe a record the budget left out alike.
 //
 //   node --test test/api-map-fixes3.test.mjs
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFile, spawn } from "node:child_process";

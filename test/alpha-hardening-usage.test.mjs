@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 import fs from 'node:fs';
 import { syncBuiltinESMExports } from 'node:module';

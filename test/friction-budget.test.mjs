@@ -11,6 +11,7 @@
 // A promise the tool makes about itself is exactly the kind of claim this
 // project exists to check.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

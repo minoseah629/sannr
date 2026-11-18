@@ -1,6 +1,7 @@
 // Independent acceptance checks for authored correction and history retention.
 // Only scratch repositories and a loopback HTTP fixture are used. The real
 // customer repositories and the npm registry are never read or changed.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile, execFileSync } from 'node:child_process';

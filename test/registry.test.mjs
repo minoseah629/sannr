@@ -17,6 +17,7 @@
 //   4. honesty under damage — a corrupt registry refuses mutation loudly and
 //      degrades reads to local-only; it never silently clobbers or invents
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";

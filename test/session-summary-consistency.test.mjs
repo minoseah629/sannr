@@ -3,6 +3,7 @@
 // snapshot (latest_session) and the session view. Checked with
 // complete evidence and with an unreadable run file, where every surface must
 // say "not recorded" rather than a count.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';

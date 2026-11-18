@@ -1,5 +1,6 @@
 // R7: an old store is readable, but a successful request cannot silently add
 // more knowledge to it. All peers and credentials here are synthetic.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';

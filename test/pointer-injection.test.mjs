@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { createFixtureStack, fixtureContextFile } from './helpers/stack-fixture.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // The managed pointer block is a committed file the agent reads as

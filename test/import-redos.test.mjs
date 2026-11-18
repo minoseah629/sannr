@@ -11,6 +11,7 @@
 //      hand-edited suite cannot reintroduce it (the committed-file belt);
 //   3. the assertion runner refuses such a pattern instead of compiling it,
 //      so an old suite already on disk cannot hang a run (the last line).
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";

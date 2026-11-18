@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";

@@ -59,7 +59,7 @@ credential scan permits them. String inputs are
 sensitive by default. Examples, defaults, descriptions and credential values
 are never copied. Credentials remain references to current stack authentication.
 
-Draft creation writes nothing and sends nothing. `ready` describes whether the
+Draft creation writes no request file and sends no API request (like any command, it can record a usage count). `ready` describes whether the
 recipe has all supported required bindings, not whether local values,
 credentials or permission to send are available. Unsupported composed schemas,
 arrays, untyped fields, unsupported required parameter locations (such as cookie

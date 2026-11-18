@@ -9,7 +9,7 @@
 // No execution happens in `init`. `learn` executes GET/HEAD only, never writes.
 
 import { codePathWithheld, forOperationCode, withCodeLocations } from '../lib/code-locations.mjs';
-import { accessSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync } from "node:fs";
+import { accessSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync, writeSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { execFileSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -36,6 +36,7 @@ import { parseAuthReference } from "../lib/auth-reference.mjs";
 import {
   PRODUCT, CLI_NAME, MCP_SERVER_KEY, LEGACY_MCP_SERVER_KEYS, LEGACY_SKILL_NAMES, POINTER_BEGIN, POINTER_END, HOME_ENV_NAME, NPM_PACKAGE,
   CI_TARBALL_BASENAME, CI_WORKFLOW_BASENAME, GRAPH_MANIFEST_BASENAME, FEEDBACK_STACK_NAME, CONTEXT_BASENAME,
+  TELEMETRY_ENV_NAME, PROSE_PRODUCT_TITLE,
 } from "../lib/brand.mjs";
 import { loadRegistry, saveRegistry, registerRepo, resolveRef, registryPath,
   grant as addGrant, revoke as dropGrant, crossLookup } from "../lib/registry.mjs";
@@ -100,6 +101,7 @@ function requireStackMigrationBeforeWriting(root) {
   if (refusal) die(refusal.code, refusal.message, refusal.command);
 }
 
+import { cliStart, noticeText, takeConnectNotice, telemetryStatus, telemetryShow, telemetryOff, telemetryOn, telemetryReset, renderStatus, renderShow } from '../lib/telemetry.mjs';
 import { LAYOUT, LEGACY_LAYOUT, layoutFor, planLayout, ensureLayout, inspectLayoutReadme, legacyLayoutEntries, migrateLayout, projectedLayoutFiles } from "../lib/layout.mjs";
 
 const PACKAGE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -1558,6 +1560,10 @@ async function cmdConnect(argv, { silent = false, selectedContract, createdStack
   process.exitCode = conflicts ? 1 : 0;
   if (silent) return report;
 
+  // The first time Sannr runs on a machine through connect, the telemetry
+  // notice is part of what connect prints, for the agent to relay.
+  const telemetryNotice = dryRun ? null : takeConnectNotice();
+  if (telemetryNotice) report.telemetry_notice = telemetryNotice;
   if (asJson) console.log(JSON.stringify(report, null, 1));
   else {
     const out = [`${localCli} connect — ${root}${dryRun ? "  (dry run: nothing written)" : ""}\n`];
@@ -1631,6 +1637,7 @@ async function cmdConnect(argv, { silent = false, selectedContract, createdStack
       out.push(`  ${row.action.padEnd(9)} ${terminalText(row.path)}`);
     out.push("", `  ${report.note}`, ...(report.powershell ? [`  ${report.powershell}`] : []), "", renderSetupReceipt(report.setup));
     if (conflicts) out.push(report.next);
+    if (telemetryNotice) out.push("", telemetryNotice);
     console.log(out.join("\n"));
   }
   // exitCode, not exit(): the process ends when the event loop drains, so a
@@ -3007,7 +3014,14 @@ async function cmdMcp(argv) {
       if (!options.dryRun && report.registrations.some(row => row.code)) process.exitCode = 1;
       return;
     }
-    inspection = await inspectMcp(options);
+    // A tool result that carried the usage notice is shown here, once, after
+    // the inspection: this command keeps no result text (USE-1 A9.3).
+    let noticeShown = false;
+    inspection = await inspectMcp({ ...options, onNotice: () => {
+      if (noticeShown) return;
+      noticeShown = true;
+      process.once("exit", () => { try { writeSync(2, `${noticeText()}\n`); } catch { /* stderr closed */ } });
+    } });
   }
   catch (error) {
     const malformed = Number.isInteger(error.malformed_frames) ? `; malformed_frames: ${error.malformed_frames}` : "";
@@ -5646,7 +5660,7 @@ const EXIT_CODES = `Exit codes (note/history policy contract; request JSON error
   3   policy refused — a non-secret note or history policy blocked the operation`;
 
 const HELP = {
-  workbench: { blurb: 'open this repository’s local workbench; inspect, send, save and hand back changes', example: `${CLI_NAME} workbench` },
+  workbench: { blurb: 'open this repository’s local workbench; inspect, send, save and hand back changes', example: `${CLI_NAME} workbench open` },
   saved: { blurb: 'create, discover and run portable requests with local typed inputs', example: `${CLI_NAME} saved list` },
   migrate: { blurb: 'move legacy knowledge, environments and evidence into named API stacks',
              example: `${CLI_NAME} migrate --dry-run --json` },
@@ -5710,6 +5724,8 @@ const HELP = {
              example: `${CLI_NAME} prune "GET /legacy" "GET /old" --dry-run` },
   unwire:  { blurb: "undo connect: remove its registrations, skills, pointer block, and exact generated CI artifacts",
              example: `${CLI_NAME} unwire` },
+  telemetry: { blurb: "daily usage counts: status, show (the exact document), off (for this home directory until on), on, reset",
+             example: `${CLI_NAME} telemetry off` },
   start:   { blurb: "set up your coding agent, inventory local APIs without requests, and prepare the next task",
              example: `${CLI_NAME} start` },
   mcp:     { blurb: "enumerate MCP declarations by default; tool calls require per-tool opt-in and a read-only claim or unsafe override",
@@ -5801,12 +5817,77 @@ function printCommandHelp(name) {
   console.log(`${CLI_NAME} ${name} — ${h.blurb}\n\n  EXAMPLE: ${h.example}${detail}\n\n${EXIT_CODES}`);
 }
 
+// --- telemetry ---------------------------------------------------------------
+//
+// The daily usage document (lib/telemetry.mjs, docs/telemetry.md).
+// None of these subcommands is counted, and none sends anything.
+function cmdTelemetry(argv) {
+  const json = argv.includes("--json");
+  const rest = argv.slice(1).filter(arg => arg !== "--json");
+  const sub = rest[0] ?? "status";
+  if (rest.length > 1 || !["status", "show", "off", "on", "reset"].includes(sub))
+    die("TELEMETRY_ARGUMENT_INVALID", "Use telemetry status, show, off, on or reset, each with optional --json.", `${CLI_NAME} telemetry status`);
+  const print = (value, human) => console.log(json ? JSON.stringify(value, null, 1) : human);
+  if (sub === "status") { const value = telemetryStatus(); print(value, renderStatus(value)); return; }
+  if (sub === "show") { const value = telemetryShow(); print(value, renderShow(value)); return; }
+  try {
+    if (sub === "off") {
+      const value = telemetryOff();
+      const tail = " Turning it off sent nothing; a document that was being prepared or was already on its way may still go out within a few seconds.";
+      const cleared = value.cleanup_pending
+        ? " Identifiers and unsent counts are deleted before any of those state directories counts or sends again."
+        : value.removed.length ? ` Removed: ${value.removed.join(", ")}.` : "";
+      let human;
+      if (value.scope === "home") {
+        human = `Telemetry is off for every ${PROSE_PRODUCT_TITLE} process run with the home directory ${value.home}, recorded in ${value.user_state_file}` +
+          `${value.recorded.here && value.state_file !== value.user_state_file ? ` and in ${value.state_file}` : ""}` +
+          `${value.other_directories.length ? `, and marked off in ${value.other_directories.length} other state director${value.other_directories.length === 1 ? "y" : "ies"} used with this home (${value.other_directories.join(", ")})` : ""}. ` +
+          (value.unmarked_directories.length ? `These state directories could not be marked and stay off only while the home's marker is there: ${value.unmarked_directories.join(", ")}. ` : "") +
+          (value.directory_list.readable ? "" : `The list of other state directories (${value.directory_list.file}) could not be read (${value.directory_list.problem}), so no other directory was marked beyond those named here; any other state directory used with this home stays off only while the home's marker is there. `) +
+          `It stays off until ${CLI_NAME} telemetry on; a process run with another home directory keeps its own setting.${tail}${cleared}` +
+          (value.here_problem ? ` Off could not also be written in ${value.state_file} (${value.here_problem.message}); the record for the home covers it.` : "");
+      } else if (value.scope === "directory") {
+        human = `Telemetry is off only for the state directory of ${value.state_file}. It could not be recorded for the home directory ${value.home} in ${value.user_state_file} (${value.user_problem.message}), ` +
+          `so other ${PROSE_PRODUCT_TITLE} state directories used with this home can still count and send. To turn it off everywhere, make that location writable and run ${CLI_NAME} telemetry off again, ` +
+          `or set ${TELEMETRY_ENV_NAME}=0 or DO_NOT_TRACK=1 in the environment of every ${PROSE_PRODUCT_TITLE} process.${tail}${cleared}`;
+      } else {
+        human = `Telemetry could not be turned off: ${value.same_directory ? `${value.state_file} could not be written (${value.here_problem.message})` : `neither ${value.state_file} (${value.here_problem.message}) nor ${value.user_state_file} (${value.user_problem?.message ?? value.here_problem.message}) could be written`}. ` +
+          `Set ${TELEMETRY_ENV_NAME}=0 or DO_NOT_TRACK=1 in the environment of every ${PROSE_PRODUCT_TITLE} process, or fix those locations and run ${CLI_NAME} telemetry off again. Nothing was sent.`;
+      }
+      print(value, human);
+      if (!value.ok) process.exitCode = 1;
+    } else if (sub === "on") {
+      const value = telemetryOn();
+      const parts = [`Telemetry is on for ${value.state_file}; this state directory starts with a new identifier at its next document, and no earlier counts are kept.`];
+      const blocked = [...value.still_off, ...value.not_lifted];
+      if (value.home_off_lifted) parts.push(`The off recorded for the home directory ${value.home} is lifted, so ${PROSE_PRODUCT_TITLE} processes run with it can count again${blocked.length ? ", except in the state directories named below" : ""}.`);
+      else parts.push(value.directory_was_off ? "" : "It was not off.");
+      if (value.still_off.length) parts.push(`These state directories were turned off themselves and stay off until telemetry on is run with them: ${value.still_off.join(", ")}.`);
+      if (value.not_lifted.length) parts.push(`These state directories could not be lifted and stay off: ${value.not_lifted.join(", ")}.`);
+      if (value.overridden_by) parts.push(`${value.overridden_by.variable ?? "This environment"} still turns it off for processes that have it.`);
+      print(value, [parts.filter(Boolean).join(" "), ...(value.notice ? [value.notice] : [])].join("\n"));
+    } else {
+      const value = telemetryReset();
+      print(value, value.changed ? "The install identifier is deleted; a new one is made at the next document. This adds no document to the day."
+        : `Nothing to reset: ${value.reason}.`);
+    }
+  } catch (error) {
+    die(typeof error.code === "string" && error.code.startsWith("TELEMETRY_") ? error.code : "TELEMETRY_STATE_UNWRITABLE",
+      typeof error.code === "string" && error.code.startsWith("TELEMETRY_") ? error.message : "The telemetry state could not be written; nothing was sent.", `Check the machine state directory, then retry ${CLI_NAME} telemetry ${sub}.`);
+  }
+}
+
 // --- entry -----------------------------------------------------------------
 
 const argv = process.argv.slice(2);
 const requestedCommand = argv[0];
 const doctorAliases = new Set(["status", "check", "health", "ping"]);
 const command = doctorAliases.has(requestedCommand) ? "doctor" : requestedCommand;
+
+// Usage counts (docs/telemetry.md): the one-time notice on stderr,
+// this run's count and, when one is due, a detached send. Synchronous local
+// file work only; it never changes stdout or the exit code.
+cliStart(argv);
 
 // stderr preserves doctor's stdout byte-for-byte — especially its JSON — while
 // making the guessed verb's redirection explicit rather than silently behaving
@@ -5898,6 +5979,7 @@ else if (command === "feedback") await cmdFeedback(argv);
 else if (command === "review") cmdReview(argv);
 else if (command === "prune") cmdPrune(argv);
 else if (command === "unwire" || command === "disconnect") await cmdUnwire(argv);
+else if (command === "telemetry") cmdTelemetry(argv);
 else {
   // A bare invocation prints help and SUCCEEDS (0); an unknown command prints
   // help but is a usage error (non-zero), so a typo is caught by a script.

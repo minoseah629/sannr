@@ -7,6 +7,7 @@
 //
 //   node --test test/audit-ci.test.mjs
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync,  rmSync, existsSync, readFileSync } from "node:fs";

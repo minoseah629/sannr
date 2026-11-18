@@ -1,5 +1,6 @@
 // Keep the installed version discoverable; prose, dates and section ordering
 // belong to release review rather than a second hand-written semver parser.
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";

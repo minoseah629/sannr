@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, realpathSync, readFileSync, writeFileSync, readdirSync, statSync, chmodSync, rmSync, symlinkSync, linkSync } from 'node:fs';

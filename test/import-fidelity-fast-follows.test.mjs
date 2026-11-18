@@ -1,5 +1,6 @@
 // Synthetic semantic fixtures only. No downloaded collections or vendor scripts
 // execute here. Positive and wrong-value cases exercise the real clause engine.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';

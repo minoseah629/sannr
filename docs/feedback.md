@@ -1,7 +1,8 @@
 # Share feedback about Sannr
 
-No account, no telemetry. The only thing it sends us is feedback. Feedback is
-optional; setup, requests and session completion never send it automatically.
+No account. Feedback is optional; setup, requests and session completion never
+send it automatically. It is separate from the daily usage counts,
+which carry no report content and are described in [telemetry](telemetry.md).
 
 `sannr feedback` writes a local report. `sannr feedback --send` writes that
 report and prepares an anonymized JSON submission to

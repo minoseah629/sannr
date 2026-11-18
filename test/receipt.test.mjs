@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // `sannr receipt` — the savings receipt (F6c, PRD Track A2).
 //

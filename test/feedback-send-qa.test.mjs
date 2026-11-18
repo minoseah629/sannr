@@ -1,5 +1,6 @@
 // Independent black-box product QA. The spawned loopback fake is a wire
 // witness, not Webster's Worker: ingress/D1/WAF/wrangler claims remain separate.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';

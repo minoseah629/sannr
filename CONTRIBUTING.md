@@ -35,6 +35,30 @@ Install dependencies once per checkout (and after lockfile changes):
 npm ci --ignore-scripts --no-audit --no-fund
 ```
 
+Usage counts ([docs/telemetry.md](docs/telemetry.md)) are off in a source tree
+of this repository, with or without `.git` (a package root that holds `.git`,
+`scripts/test-unit.mjs` or `test/telemetry.test.mjs`), and in any process a
+test runner marks. The test runner (`npm test`, `npm run test:full`) gives
+every test process its own temporary home, state directory, usage log and npm
+cache, with usage counts off. Every test file and test harness imports
+`test/helpers/isolated-home.mjs` as its first import or re-export, comments
+and multi-line imports read as Node reads them (`test/test-isolation.test.mjs`
+fails for one that does not). The helper does the same for a file run
+directly, and fills the home, the off switch and `DO_NOT_TRACK` into every
+environment a test builds by hand for a process it starts through
+`node:child_process` (a key the test sets to `undefined` counts as not set;
+a key it sets to a value, even an empty string, is kept). It cannot reach a
+shell command that unsets `HOME` (`unset HOME; …`, `env -u HOME …`), a
+process started by something other than the test (a script or host that does
+not import the helper), or a test that deletes `HOME` from its own
+environment; the product covers those cases itself, since a process whose
+environment names no home directory never counts, sends or writes telemetry
+state. Only `test/telemetry.test.mjs` turns usage counts on, in its own
+temporary `SANNR_HOME` and `HOME` with every request intercepted, and points
+the account's fallback home at a temporary directory when it starts a
+process with no home directory.
+intercepted.
+
 For a small code change, run its affected tests, then the fast safety check
 before handoff. For example, an environment-selection fix:
 

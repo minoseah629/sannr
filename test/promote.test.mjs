@@ -11,6 +11,7 @@
 // Fixtures are realistic on purpose: a small dev-sized table where every field
 // looks categorical is exactly the case that breaks heuristics.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { promoteObservation } from "../lib/promote.mjs";

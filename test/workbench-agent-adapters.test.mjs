@@ -1,5 +1,6 @@
 // Process-level proof of a standalone viewport and repository operator inbox.
 // Both the MCP peer and API fixture are child processes; no model or vendor runs.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -48,7 +49,7 @@ function child(command, args, options) {
 }
 async function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'workbench-agent-adapters-'));
-  const env = { PATH: process.env.PATH, HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'machine'),
+  const env = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'machine'),
     API_CONTEXT_DIR: root, API_USAGE_LOG: join(root, 'machine', 'usage.jsonl'), API_BUDGET: '6000',
     API_FRICTION_OFF: '1', NO_COLOR: '1' };
   mkdirSync(env.HOME, { recursive: true });

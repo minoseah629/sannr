@@ -2,6 +2,7 @@
 // processes (the MCP server) run against a loopback fixture server in its own
 // process; earlier sessions are synthetic run files with the client's shape.
 // Every CLI run uses an isolated HOME and machine-state directory.
+import './helpers/isolated-home.mjs';
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';

@@ -7,6 +7,7 @@
 // evidence (N3), identifiers that only resemble dates link again (N2), and a
 // JSON:API document keeps its member, attribute and relationship names (A1,
 // A2). All data is synthetic.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';

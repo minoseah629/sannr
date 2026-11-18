@@ -3,6 +3,7 @@
 // and JSON:API member, attribute and relationship names are field names (A2).
 // Every value is synthetic. Functions are read from the module namespace so a
 // test against an engine without them fails on its own assertion.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as ks from '../lib/key-sources.mjs';

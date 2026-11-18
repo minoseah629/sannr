@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { createFixtureStack, fixtureContextFile } from './helpers/stack-fixture.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // CLI-level freshness invariants that unit tests on freshnessFor cannot see:

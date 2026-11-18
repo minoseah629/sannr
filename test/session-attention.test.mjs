@@ -1,5 +1,6 @@
 // Synthetic, offline W1 evidence. Each fixture isolates HOME and machine state;
 // no transport, installed host or customer repository is involved.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';

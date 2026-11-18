@@ -7,6 +7,7 @@
 // is driven with spawnSync, which blocks this one).
 //
 //   node --test test/api-map-fixes2.test.mjs
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";

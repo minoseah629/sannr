@@ -1,5 +1,6 @@
 // AX-C — own the verbs agents guess, without hiding heuristic uncertainty.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { chmodSync, existsSync, linkSync, mkdirSync, mkdtempSync,

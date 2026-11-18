@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { runNetwork, runJob, defective } from './robustness/network-driver.mjs';

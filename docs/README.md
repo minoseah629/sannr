@@ -53,6 +53,8 @@ remembered command.
 - [Privacy](privacy.md): what is stored where, and what leaves the machine.
 - [Network behavior](network-behavior.md): every network path, by trigger.
 - [Feedback](feedback.md): the optional send, its payload and consent policy.
+- [Telemetry](telemetry.md): the daily usage counts, what they contain,
+  what a send reveals and how to turn them off.
 - [Limitations](limitations.md): what this release does not do.
 - [Workbench security](workbench-security.md): pairing, the local boundary
   and its limits.

@@ -48,6 +48,11 @@ use the narrowest suitable alternative. Capture a scoped external observation
 when possible, clearly attributed to that client. Do not label it Sannr-verified
 or silently turn the exception into the normal path.
 
+## Usage counts
+
+Sannr sends usage counts once a day unless turned off. If the person says
+"opt out", run `sannr telemetry off` and show them its output.
+
 ## Before the MCP server loads
 
 A newly registered server may need a host restart and its trust/MCP prompt.
@@ -80,14 +85,45 @@ setup binding matches this repository before saying the MCP server is ready.
 
 ## Workbench continuity
 
-When the user asks to open the workbench, use the installed CLI's `workbench`
-command from this repository's terminal. The terminal launches the viewport
-and keeps it running without a coding agent. If `api_workbench` is actually
-loaded, you may announce optional presence with `attach` and a short task label;
-do not make attachment a prerequisite for launch or use. A heartbeat records
-MCP process presence, not model activity or receipt of a handoff. If the tool is
-missing, explain the update/restart needed for its actions; terminal launch is
-still available.
+When the user asks to open the workbench, open it yourself; do not send them
+to a terminal. First decide which repository they mean: one they named wins,
+then the repository the conversation or task is about, then the current
+directory. The chat's own directory is only the last of these. If two
+repositories are equally likely, ask one short question and open neither until
+they answer.
+
+Then open that checkout, and only that one:
+
+- If `api_workbench` is loaded, call it with `{"action":"open","project":"<the
+  checkout path>"}`. The tool acts for the repository its server is bound to.
+  When your target is another checkout it answers
+  `WORKBENCH_REPOSITORY_MISMATCH` and opens nothing; that is expected.
+- Otherwise, or after that refusal, run the target checkout's own CLI:
+  `workbench open --project <the checkout path> --json`, or the same command
+  without `--project` from inside it. Follow that checkout's instructions.
+
+Never rebind an MCP server, initialize or connect a repository, or open the
+current repository instead because the target failed. A missing or
+unconfigured target has a named result (`WORKBENCH_PROJECT_NOT_FOUND`,
+`WORKBENCH_PROJECT_NOT_CONFIGURED`): report it.
+
+Tell the user which repository opened, by name and path, whether its workbench
+was started or was already running, and what happened to the browser, exactly
+as the result states it. `browser.state: "dispatched"` means the system opener
+accepted the request; only `page.state: "connected"` means a page reached the
+workbench. If the browser could not be opened, the workbench is still running:
+give the user the result's next step and its URL, and say that the URL alone
+will not connect. When the conversation is about one operation or view, you may
+pass `operation` with `stack`, or `view`; these never change which repository
+opens. Opening sends no API request and is not permission to send one.
+`workbench stop` (or the tool's `stop`) closes one repository's workbench.
+
+`show` is different: it launches nothing and only offers a session to a
+workbench that is already open. If `api_workbench` is loaded, you may announce
+optional presence with `attach` and a short task label; do not make attachment
+a prerequisite for opening or use. A heartbeat records MCP process presence,
+not model activity or receipt of a handoff. If the tool is missing, explain the
+update/restart needed for its actions; the CLI's `workbench open` still works.
 
 When the user asks you to pick up workbench changes, or a tool result names a
 pending inbox, use `api_workbench status`, then `read` for the explicit session

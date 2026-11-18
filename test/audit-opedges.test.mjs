@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Operation-level edges: not just WHO a consumer calls, but WHICH declared
 // operations of the upstream its source actually sends requests to.

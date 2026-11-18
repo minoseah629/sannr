@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -18,7 +19,7 @@ const PKG = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
 // guide; CONTEXT-2a adds the shipped discovery guide. Keep this list exact: widening the package's files list
 // still requires a deliberate test change.
 const FILES = ["bin/", "lib/", "skill/", "stacks/", "server.mjs", "README.md",
-  "CHANGELOG.md", "SUPPORT.md", "SECURITY.md", "TRADEMARK.md", "docs/README.md", "docs/install.md", "docs/privacy.md", "docs/limitations.md", "docs/troubleshooting.md", "docs/agent-examples.md", "docs/agent-guide.md", "docs/api-call-policy.md", "docs/ci.md", "docs/dependency-graph-design.md", "docs/dependency-graph.md", "docs/discovery.md", "docs/feedback.md", "docs/imports.md", "docs/install-prompt.md", "docs/layout.md", "docs/stacks.md", "docs/survey.md", "docs/mcp.md", "docs/network-behavior.md", "docs/note-history.md", "docs/protocols.md", "docs/quickstart.md", "docs/sessions.md", "docs/saved-requests.md", "docs/workbench.md", "docs/workbench-security.md", "docs/view.md", "LICENSE", "scripts/write-build-id.mjs"];
+  "CHANGELOG.md", "SUPPORT.md", "SECURITY.md", "TRADEMARK.md", "docs/README.md", "docs/install.md", "docs/privacy.md", "docs/limitations.md", "docs/troubleshooting.md", "docs/agent-examples.md", "docs/agent-guide.md", "docs/api-call-policy.md", "docs/ci.md", "docs/dependency-graph-design.md", "docs/dependency-graph.md", "docs/discovery.md", "docs/feedback.md", "docs/imports.md", "docs/install-prompt.md", "docs/layout.md", "docs/stacks.md", "docs/survey.md", "docs/telemetry.md", "docs/mcp.md", "docs/network-behavior.md", "docs/note-history.md", "docs/protocols.md", "docs/quickstart.md", "docs/sessions.md", "docs/saved-requests.md", "docs/workbench.md", "docs/workbench-security.md", "docs/view.md", "LICENSE", "scripts/write-build-id.mjs"];
 const CONTEXT_RUNTIME_FILES = ['lib/draft-notes.mjs', 'lib/evidence-confidence.mjs'];
 const BUILTIN_STACK_FILES = ["stacks/sannr-feedback/stack.json", "stacks/sannr-feedback/feedback.openapi.json", "stacks/sannr-feedback/sannr.json"];
 const BASE = [

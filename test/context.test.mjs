@@ -8,6 +8,7 @@
 // tests pin the two defects it found AND the boundaries that held, so the blind
 // spot stops being blind.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, writeFileSync } from "node:fs";

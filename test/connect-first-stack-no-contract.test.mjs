@@ -2,6 +2,7 @@
 // --base-url, or from the one public API the code visibly calls, so the first
 // session's notes have a committed home. Everything here is local fixtures:
 // connect sends no API request, and the detected URLs are never contacted.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';

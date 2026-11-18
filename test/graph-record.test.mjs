@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { createFixtureStack, fixtureContextFile, fixtureEvidencePath } from './helpers/stack-fixture.mjs';
 import { projectGraphStackFixture } from './helpers/graph-stack-fixture.mjs';
 import { LAYOUT } from "../lib/layout.mjs";

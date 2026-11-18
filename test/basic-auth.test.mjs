@@ -1,4 +1,5 @@
 // Native Basic authentication, using synthetic credentials and loopback only.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';

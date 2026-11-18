@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // THE INSTALLED COPY — does this work when it is not a git clone?
 //

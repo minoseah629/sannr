@@ -1,5 +1,6 @@
 // Public CLI/MCP presentation checks with an in-process fetch stub. No socket
 // is opened. These supplement, not replace, the existing loopback wire tests.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';

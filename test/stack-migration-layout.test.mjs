@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -117,7 +118,7 @@ test('renamed layout rewrites only schema-owned moved contract and env-file refe
 async function migrateCommand(root, args) {
   const cli = fileURLToPath(new URL('../bin/cli.mjs', import.meta.url));
   const child = spawn(process.execPath, [cli, 'migrate', '--json', ...args], {
-    cwd: root, env: { PATH: process.env.PATH, HOME: root, API_CONTEXT_DIR: root,
+    cwd: root, env: { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: root, API_CONTEXT_DIR: root,
       API_USAGE_LOG: '', NO_COLOR: '1' }, stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stdout = '', stderr = '';

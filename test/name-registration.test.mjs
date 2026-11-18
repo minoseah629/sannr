@@ -1,5 +1,6 @@
 // NAME-1, 2026-10-06: synthetic migration specimens. These tests never launch
 // an old command or contact an API. Dead launch paths deliberately stay dead.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';

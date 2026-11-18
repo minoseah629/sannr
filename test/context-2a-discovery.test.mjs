@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -31,7 +32,7 @@ function fixture(t, files = {}) {
     globalThis.fetch=refuse; http.request=http.get=https.request=https.get=refuse; net.Socket.prototype.connect=refuse;`);
   t.after(() => { try { assert.equal(existsSync(networkAttempt),false,'Static inventory attempted network I/O'); }
     finally { rmSync(dir, {recursive:true,force:true}); } });
-  const env = { PATH:process.env.PATH, HOME:home, [HOME_ENV_NAME]:join(dir,'machine'),
+  const env = { PATH:process.env.PATH, DO_NOT_TRACK:'1', HOME:home, [HOME_ENV_NAME]:join(dir,'machine'),
     API_CONTEXT_DIR:root, API_USAGE_LOG:join(dir,'usage.jsonl'), API_FRICTION_OFF:'1', NO_COLOR:'1',
     NODE_OPTIONS:`--import ${pathToFileURL(guard).href}` };
   async function run(args, overrides = {}) {

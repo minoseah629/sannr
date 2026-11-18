@@ -1,6 +1,7 @@
 // Integration test: a long wait_for must not hold its host's concurrency slot.
 // Requires editorial-api on 127.0.0.1:8787. Skips cleanly if it is not running.
 //   node --test test/lane.test.mjs
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

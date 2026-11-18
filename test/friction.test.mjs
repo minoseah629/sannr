@@ -7,6 +7,7 @@
 // ordinary traffic gets disabled in a week. Most of these tests are about the
 // second one, because that is the failure that kills the product quietly.
 
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, writeFileSync, symlinkSync, mkdirSync } from "node:fs";

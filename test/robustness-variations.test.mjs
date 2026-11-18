@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // ROB-1 gate: every importer entry point survives deterministic variations of
 // the in-repo seeds. Hermetic by construction — the seeds live in the

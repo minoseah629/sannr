@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Codex-facing MCP and runtime compatibility. These tests exercise the wire
 // schema a strict MCP host sees and the client plumbing that batch execution

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // Consistency with yourself (ADR-0035 §2): cluster one service's observed
 // conventions and flag the minority.

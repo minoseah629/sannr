@@ -1,5 +1,6 @@
 // The common context stores scoped shapes and provenance, never payload values.
 // All repositories, registries, and evidence files are disposable local fixtures.
+import './helpers/isolated-home.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, } from "node:fs";

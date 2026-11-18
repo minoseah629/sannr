@@ -1,5 +1,6 @@
 // Exercise public process adapters, not just the shared dispatcher. All traffic
 // is a test-owned loopback fixture; invocation values and HOME stay isolated.
+import './helpers/isolated-home.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -39,7 +40,7 @@ function childResult(command, args, options = {}, input = '') {
 }
 async function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'workbench-adapters-')), seen = [], clients = [];
-  const env = { PATH: process.env.PATH, HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'machine'),
+  const env = { PATH: process.env.PATH, DO_NOT_TRACK: '1', HOME: join(root, 'home'), [HOME_ENV_NAME]: join(root, 'machine'),
     API_CONTEXT_DIR: root, API_USAGE_LOG: join(root, 'machine', 'usage.jsonl'), API_BUDGET: '6000', API_FRICTION_OFF: '1', NO_COLOR: '1' };
   mkdirSync(env.HOME, { recursive: true });
   assert.equal((await childResult('git', ['init', '--quiet'], { cwd: root, env })).code, 0);

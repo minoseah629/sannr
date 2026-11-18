@@ -1,4 +1,5 @@
 // REL-1: validate the actual workflow YAML without a GitHub run or network.
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";

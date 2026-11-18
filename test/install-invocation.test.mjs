@@ -3,6 +3,7 @@
 // npm install puts it one directory deeper than an unscoped one. These tests
 // lay the package out the way npm does for a repository-local install and for
 // an `npx` run, then read the command a refusal tells the user to run.
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -47,7 +48,8 @@ function installed(t, layout, files = {}) {
 }
 
 function refusalNext(t, layout) {
-  // No TTY on stdin: the workbench refuses and names the command to run instead.
+  // No TTY on stdin: the terminal launch refuses and names the command that
+  // needs no terminal, in the form this install can run.
   const run = installed(t, layout)("workbench");
   assert.equal(run.status, 1, run.stderr);
   const error = JSON.parse(run.stdout || run.stderr).error;
@@ -56,11 +58,11 @@ function refusalNext(t, layout) {
 }
 
 test("after a repository-local npm install, printed commands use the project's shim", t => {
-  assert.equal(refusalNext(t, "local"), `./node_modules/.bin/${PRODUCT} workbench`);
+  assert.equal(refusalNext(t, "local"), `./node_modules/.bin/${PRODUCT} workbench open`);
 });
 
 test("after an npx run, printed commands use the exact npx form, not a bare name that is not on PATH", t => {
-  assert.equal(refusalNext(t, "npx"), `npx --yes ${NPM_PACKAGE}@${VERSION} workbench`);
+  assert.equal(refusalNext(t, "npx"), `npx --yes ${NPM_PACKAGE}@${VERSION} workbench open`);
 });
 
 test("the survey command a reader prints is runnable after an npx run", t => {

@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { LAYOUT } from "../lib/layout.mjs";
 // The map (Track A1): the derived graph rendered as a shareable artifact.
 //

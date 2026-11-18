@@ -12,7 +12,7 @@ vulnerability.
 <!-- install-prompt:begin -->
 ## Tell your coding agent:
 
-> Install Sannr in this repository. From the repo root, run `npx @sannr/sannr connect` and follow what it prints. It adds the Sannr skills, registers its MCP server and adds a short pointer block to AGENTS.md / CLAUDE.md. Then run `npx @sannr/sannr doctor` and show me the result. doctor announces one GET to https://api.github.com/zen before sending it, so I can see the API client work (use `--offline` to skip it). API knowledge and request evidence stay on this machine and in this repo. No account, no telemetry. The only thing it sends us is feedback. If it asks for a restart, tell me; when I reopen the agent here I'll say "Finish sannr setup."
+> Install Sannr in this repository. From the repo root, run `npx @sannr/sannr connect` and follow what it prints. It adds the Sannr skills, registers its MCP server and adds a short pointer block to AGENTS.md / CLAUDE.md. Then run `npx @sannr/sannr doctor` and show me the result. doctor announces one GET to https://api.github.com/zen before sending it, so I can see the API client work (use `--offline` to skip it). API knowledge and request evidence stay on this machine and in this repo. No account. Sannr sends usage counts once a day: a random install ID that links one day's counts to the next, its version, my operating system, how many times each command ran and how many API calls went through it, nothing about my repositories, APIs or requests. Tell me this; it is on unless I opt out. If I say "opt out", run `npx @sannr/sannr telemetry off`. If it asks for a restart, tell me; when I reopen the agent here I'll say "Finish sannr setup."
 
 ## Or by hand:
 
@@ -32,8 +32,11 @@ then read its loss report for anything unsupported before you run it.
 
 It runs locally, through MCP or the command line, with Claude Code, Codex or
 Cursor. Knowledge you commit travels with the repository; request evidence stays
-on the machine that recorded it. No account, no telemetry. The only thing it
-sends us is feedback, which is optional and asks first. You need Node 22 or
+on the machine that recorded it. No account. Once a day it sends us usage
+counts with a random install identifier, on unless you turn it off and never
+before it has printed a notice on that machine ([telemetry](docs/telemetry.md)
+says what is sent and what a send reveals); feedback is optional and asks
+first. You need Node 22 or
 newer on macOS, Linux or Windows; the [Windows notes](docs/install.md#windows)
 cover PowerShell and what is verified there. See
 [privacy](docs/privacy.md) and [limitations](docs/limitations.md).
@@ -62,9 +65,12 @@ to expect. In short, from the root of a git repository:
    yourself: `npx @sannr/sannr request GET /zen --stack github --expect-status 200`,
    then follow the quickstart's note and readback commands after a successful response.
 5. `npx @sannr/sannr workbench` in an interactive terminal opens the local
-   Workbench. Pair the browser with the code the terminal asks for, then read
+   Workbench (or ask your coding agent to open it, which runs `workbench open`
+   and needs no code). Pair the browser with the code the terminal asks for, then read
    the `github` stack's note and its trace on the Workbench view, or switch to
-   the Map view to see which code defines which operation.
+   the Map view to see which code defines which operation. The Activity view
+   lists the requests recorded on this machine, and the Request view sends one
+   by hand.
 6. Commit `.sannr/`. The next session, on any machine, starts with that note.
 
 Setup details, host notes, repair and removal are in [install](docs/install.md).

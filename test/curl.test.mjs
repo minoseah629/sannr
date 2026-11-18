@@ -1,4 +1,5 @@
 // The curl parser is a security boundary, not a convenience. node --test test/curl.test.mjs
+import './helpers/isolated-home.mjs';
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseCurl, tokenize } from "../lib/curl.mjs";

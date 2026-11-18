@@ -1,3 +1,4 @@
+import './helpers/isolated-home.mjs';
 import { PRODUCT } from '../lib/brand.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
